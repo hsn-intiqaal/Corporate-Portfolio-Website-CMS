@@ -1,0 +1,116 @@
+@import 'tailwindcss';
+
+/* Brand colours are injected per site from Settings (approved palettes only). */
+@theme {
+  --color-brand: var(--brand-primary, #0b5ea8);
+  --color-brand-dark: var(--brand-primary-dark, #083f73);
+  --color-accent: var(--brand-accent, #18a0c9);
+  --color-ink: #0f172a;
+  --color-muted: #475569;
+  --color-line: #e2e8f0;
+  --color-soft: #f5f7fa;
+  --font-sans: var(--font-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic-stack: var(--font-arabic), var(--font-latin), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  html[lang='ar'] body {
+    font-family: var(--font-arabic-stack);
+    line-height: 1.85;
+  }
+  body {
+    @apply bg-white text-ink antialiased;
+    line-height: 1.65;
+    text-rendering: optimizeLegibility;
+  }
+  html[lang='ar'] h1,
+  html[lang='ar'] h2,
+  html[lang='ar'] h3 {
+    line-height: 1.45;
+  }
+  h1, h2, h3, h4 {
+    @apply font-bold tracking-tight text-ink;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply bg-brand text-white hover:bg-brand-dark;
+  }
+  .btn-secondary {
+    @apply border border-current bg-transparent hover:bg-black/5;
+  }
+  .btn-light {
+    @apply bg-white text-brand-dark hover:bg-white/90;
+  }
+  .eyebrow {
+    @apply mb-3 inline-block text-sm font-semibold tracking-wide text-brand uppercase;
+  }
+  html[lang='ar'] .eyebrow {
+    @apply tracking-normal normal-case;
+  }
+  .section-title {
+    @apply text-3xl sm:text-4xl;
+  }
+  .card {
+    @apply overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md;
+  }
+  .field {
+    @apply block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-start text-ink placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/30 focus:outline-none aria-invalid:border-red-500;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink;
+  }
+
+  /* Rich text from the CMS */
+  .prose-cms {
+    @apply max-w-none text-muted;
+  }
+  .prose-cms > * + * { @apply mt-4; }
+  .prose-cms h2 { @apply mt-10 text-2xl text-ink; }
+  .prose-cms h3 { @apply mt-8 text-xl text-ink; }
+  .prose-cms h4 { @apply mt-6 text-lg text-ink; }
+  .prose-cms a { @apply font-medium text-brand underline underline-offset-2 hover:text-brand-dark; }
+  .prose-cms ul { @apply list-disc ps-6; }
+  .prose-cms ol { @apply list-decimal ps-6; }
+  .prose-cms li + li { @apply mt-1.5; }
+  .prose-cms blockquote { @apply border-s-4 border-brand ps-4 text-ink italic; }
+  .prose-cms table { @apply w-full border-collapse text-sm; }
+  .prose-cms th, .prose-cms td { @apply border border-line px-3 py-2 text-start; }
+  .prose-cms th { @apply bg-soft font-semibold text-ink; }
+  .prose-cms img { @apply rounded-xl; }
+  .prose-cms hr { @apply my-8 border-line; }
+
+
+  /* Direction-aware icons: arrows and chevrons flip in Arabic. */
+  [dir='rtl'] .flip-rtl { transform: scaleX(-1); }
+
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+}
+
+/* Unlayered so it wins over utility classes inside dark / brand-coloured sections. */
+.on-dark .prose-cms,
+.on-dark .text-muted { color: rgb(255 255 255 / 0.82); }
+.on-dark h1, .on-dark h2, .on-dark h3, .on-dark h4 { color: #fff; }
+.on-dark .eyebrow { color: rgb(255 255 255 / 0.82); }
+.on-dark .bg-white .text-muted, .on-dark .bg-white h2, .on-dark .bg-white h3 { color: inherit; }

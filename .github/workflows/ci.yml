@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: cms
+          POSTGRES_PASSWORD: cms
+          POSTGRES_DB: cms
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U cms" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://cms:cms@localhost:5432/cms
+      PAYLOAD_SECRET: ci-secret-not-for-production
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+      NODE_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - name: Apply migrations to an empty database
+        run: pnpm payload migrate
+      - name: Check migrations match the schema
+        run: |
+          pnpm payload migrate:create ci-check --skip-empty
+          if ls src/migrations/*ci_check* >/dev/null 2>&1; then
+            echo "::error::The Payload schema changed without a migration. Run 'pnpm migrate:create <name>' and commit it."
+            exit 1
+          fi
+      - run: pnpm seed
+      - run: pnpm build
+      - name: Smoke test
+        run: |
+          pnpm start &
+          npx --yes wait-on@8.0.4 http://localhost:3000/robots.txt --timeout 60000
+          pnpm test:smoke
