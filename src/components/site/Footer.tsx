@@ -7,6 +7,7 @@ import { formatYear } from '@/lib/format'
 import { CMSLink, type LinkData } from './CMSLink'
 import { Icon, SocialIcon } from './Icon'
 import { Media } from './Media'
+import { NewsletterForm } from '../forms/NewsletterForm'
 
 export async function Footer({ locale }: { locale: Locale }) {
   const [footer, settings] = await Promise.all([getFooter(locale), getSettings(locale)])
@@ -79,12 +80,28 @@ export async function Footer({ locale }: { locale: Locale }) {
           </ul>
         </div>
       </div>
+      {settings.newsletterEnabled !== false && (
+        <div className="border-t border-white/10">
+          <div className="container-site grid items-center gap-6 py-10 lg:grid-cols-2">
+            <div>
+              <h2 className="text-lg font-semibold text-white">{t.newsletter.title}</h2>
+              <p className="mt-1 text-sm">{t.newsletter.text}</p>
+            </div>
+            <NewsletterForm locale={locale} t={t.newsletter} dark />
+          </div>
+        </div>
+      )}
       <div className="border-t border-white/10">
         <div className="container-site flex flex-col gap-3 py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {formatYear(new Date().getFullYear(), locale, numerals)} {settings.siteName}. {t.rights}
           </p>
-          <ul className="flex flex-wrap gap-4">
+          <ul className="flex flex-wrap items-center gap-4">
+            <li>
+              <a href={`/${locale}/feed.xml`} className="inline-flex items-center gap-1 hover:text-white">
+                <Icon name="rss" className="size-3.5" /> {t.rss}
+              </a>
+            </li>
             {(footer.legalLinks ?? []).map((l) => (
               <li key={l.id}>
                 <CMSLink link={l.link as LinkData} locale={locale} className="hover:text-white" />

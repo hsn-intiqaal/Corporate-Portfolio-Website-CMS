@@ -10,6 +10,7 @@ import type { CollectionSlug, GlobalSlug, Payload } from 'payload'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { placeholderImage, placeholderLogo } from './images'
+import { simplePdf } from './pdf'
 import { doc, h, p, ul } from './richtext'
 
 type Bi = { __bi: true; ar: unknown; en: unknown }
@@ -79,7 +80,7 @@ async function seed() {
   }
   if (force) {
     if (process.env.NODE_ENV === 'production') throw new Error('Refusing to wipe content in production')
-    for (const collection of ['redirects', 'leads', 'lead-files', 'pages', 'projects', 'services', 'project-categories', 'media', 'audit-logs'] as CollectionSlug[]) {
+    for (const collection of ['redirects', 'leads', 'lead-files', 'subscribers', 'pages', 'articles', 'article-categories', 'authors', 'documents', 'projects', 'services', 'project-categories', 'media', 'audit-logs'] as CollectionSlug[]) {
       await payload.delete({ collection, where: { id: { exists: true } }, context: ctx })
     }
   }
@@ -186,6 +187,91 @@ async function seed() {
     projects.push(created.id)
   }
 
+  payload.logger.info('Seeding authors, article categories and articles...')
+  const authorImg1 = await uploadImage(payload, 81, t('صورة الكاتب', 'Author photo'), 400, 400)
+  const authorImg2 = await uploadImage(payload, 82, t('صورة الكاتبة', 'Author photo'), 400, 400)
+  const authors = [
+    await createBi(payload, 'authors', { slug: 'engineering-team', name: t('فريق الهندسة', 'Engineering Team'), role: t('قسم الهندسة', 'Engineering department'), photo: authorImg1, bio: t('فريق المهندسين لدينا يشارك خبراته العملية من المشاريع.', 'Our engineers share practical lessons from real projects.') }),
+    await createBi(payload, 'authors', { slug: 'editorial', name: t('فريق التحرير', 'Editorial Team'), role: t('التسويق والاتصال', 'Marketing & communications'), photo: authorImg2, bio: t('أخبار الشركة ونصائح للعملاء.', 'Company news and advice for clients.') }),
+  ]
+  const artCatDefs = [
+    { slug: 'guides', ar: 'أدلة ونصائح', en: 'Guides & tips', dar: 'نصائح عملية قبل وأثناء تنفيذ مشروعك.', den: 'Practical advice before and during your project.' },
+    { slug: 'news', ar: 'أخبار الشركة', en: 'Company news', dar: 'آخر أخبارنا ومشاريعنا.', den: 'Our latest news and projects.' },
+    { slug: 'industry', ar: 'القطاع والتقنيات', en: 'Industry & technology', dar: 'اتجاهات وتقنيات حديثة في القطاع.', den: 'Trends and new technology in the industry.' },
+  ]
+  const articleCategories: number[] = []
+  for (const c of artCatDefs) articleCategories.push((await createBi(payload, 'article-categories', { slug: c.slug, title: t(c.ar, c.en), description: t(c.dar, c.den) })).id)
+
+  const articleDefs = [
+    { slug: 'how-to-plan-your-project', ar: 'كيف تخطط لمشروعك خطوة بخطوة', en: 'How to plan your project step by step', cat: 0 },
+    { slug: 'choosing-the-right-contractor', ar: 'كيف تختار المقاول المناسب', en: 'Choosing the right contractor', cat: 0 },
+    { slug: 'preventive-maintenance-checklist', ar: 'قائمة الصيانة الوقائية الدورية', en: 'Preventive maintenance checklist', cat: 0 },
+    { slug: 'budgeting-mistakes-to-avoid', ar: 'أخطاء شائعة في الميزانية وكيف تتجنبها', en: 'Budgeting mistakes to avoid', cat: 0 },
+    { slug: 'we-completed-project-250', ar: 'أنجزنا مشروعنا رقم ٢٥٠', en: 'We completed our 250th project', cat: 1 },
+    { slug: 'new-office-opening', ar: 'افتتاح مكتبنا الجديد', en: 'Our new office is open', cat: 1 },
+    { slug: 'safety-award', ar: 'حصولنا على جائزة السلامة', en: 'We received a safety award', cat: 1 },
+    { slug: 'sustainable-materials', ar: 'المواد المستدامة في البناء الحديث', en: 'Sustainable materials in modern construction', cat: 2 },
+    { slug: 'smart-building-technology', ar: 'تقنيات المباني الذكية', en: 'Smart building technology', cat: 2 },
+    { slug: 'energy-efficiency-tips', ar: 'نصائح لرفع كفاءة الطاقة', en: 'Energy efficiency tips', cat: 2 },
+  ]
+  const articles: number[] = []
+  for (const [i, a] of articleDefs.entries()) {
+    const cover = await uploadImage(payload, 90 + i, t(`صورة مقال: ${a.ar}`, `Article image: ${a.en}`), 1600, 1000)
+    const created = await createBi(payload, 'articles', {
+      _status: 'published',
+      slug: a.slug,
+      title: t(a.ar, a.en),
+      excerpt: t(`مقال تجريبي بعنوان «${a.ar}» يوضح طريقة عرض المقالات. يُستبدل بالمحتوى المعتمد.`, `A sample article, “${a.en}”, showing how articles are presented. To be replaced with approved content.`),
+      coverImage: cover,
+      author: authors[i % 2].id,
+      categories: [articleCategories[a.cat]],
+      tags: [{ tag: t('مشاريع', 'projects') }, { tag: t('نصائح', 'tips') }],
+      relatedServices: [services[i % services.length]],
+      publishedAt: new Date(Date.UTC(2026, 9, 25 - i * 9)).toISOString(),
+      featured: i < 3,
+      content: t(
+        doc(
+          p('مقدمة تجريبية للمقال. هذا النص يوضح شكل الفقرات وطول السطر المناسب للقراءة باللغة العربية.'),
+          h('لماذا هذا الموضوع مهم'),
+          p('فقرة توضيحية عن أهمية الموضوع وأثره على نجاح المشروع وتكلفته وجودته على المدى الطويل.'),
+          h('الخطوات الأساسية'),
+          h('١. التقييم الأولي', 'h3'),
+          p('حدد احتياجاتك وأهدافك والميزانية المتاحة قبل البدء.'),
+          h('٢. التخطيط والتصميم', 'h3'),
+          p('ضع خطة واضحة وجدولاً زمنياً واقعياً بالتعاون مع فريق متخصص.'),
+          ul(['تحديد النطاق بدقة', 'مراجعة العروض', 'متابعة التنفيذ']),
+          h('الخلاصة'),
+          p('التخطيط الجيد يوفر الوقت والتكلفة. تواصل معنا لمناقشة مشروعك.'),
+        ),
+        doc(
+          p('A placeholder introduction. This text shows paragraph styling and a comfortable reading width.'),
+          h('Why this matters'),
+          p("An explanatory paragraph on why the topic matters for a project's cost, quality and long-term success."),
+          h('The key steps'),
+          h('1. Initial assessment', 'h3'),
+          p('Define your needs, goals and budget before you start.'),
+          h('2. Planning and design', 'h3'),
+          p('Agree a clear plan and a realistic schedule with a specialist team.'),
+          ul(['Define the scope precisely', 'Compare proposals', 'Follow up during delivery']),
+          h('Summary'),
+          p('Good planning saves time and money. Contact us to discuss your project.'),
+        ),
+      ),
+    })
+    articles.push(created.id)
+  }
+
+  payload.logger.info('Seeding downloadable brochure...')
+  const pdf = simplePdf(['Company Profile', 'Placeholder brochure - replace with the approved company profile PDF.', 'Services - Projects - Contact'])
+  const brochureDoc = await payload.create({
+    collection: 'documents',
+    data: { title: 'الملف التعريفي للشركة', description: 'تعرّف على خدماتنا ومشاريعنا في ملف واحد.', gated: true },
+    file: { data: pdf, mimetype: 'application/pdf', name: 'company-profile.pdf', size: pdf.length },
+    locale: 'ar',
+    context: ctx,
+  })
+  await payload.update({ collection: 'documents', id: brochureDoc.id, data: { title: 'Company profile', description: 'Our services and projects in one document.' }, locale: 'en', context: ctx })
+
   payload.logger.info('Seeding pages...')
   const quoteBtn = { type: 'custom', url: '/request-a-quote', label: t('اطلب عرض سعر', 'Request a quotation'), appearance: 'primary' }
   const home = await createBi(payload, 'pages', {
@@ -244,6 +330,19 @@ async function seed() {
       },
       { blockType: 'projectGallery', title: t('مشاريع مختارة', 'Selected projects'), mode: 'featured', layout: 'grid', limit: 6, showViewAll: true, settings: settings() },
       {
+        blockType: 'process',
+        title: t('كيف نعمل', 'How we work'),
+        intro: t('أربع خطوات واضحة من أول تواصل حتى التسليم.', 'Four clear steps from first contact to handover.'),
+        steps: [
+          { title: t('الاستشارة', 'Consultation'), text: t('نستمع لاحتياجاتك ونزور الموقع.', 'We listen to your needs and visit the site.'), icon: 'users' },
+          { title: t('التصميم والعرض', 'Design & proposal'), text: t('نقدم تصميماً وعرض سعر مفصلاً.', 'We deliver a design and a detailed quotation.'), icon: 'tools' },
+          { title: t('التنفيذ', 'Delivery'), text: t('فريقنا ينفذ مع تقارير دورية.', 'Our team builds, with regular reports.'), icon: 'building' },
+          { title: t('التسليم والدعم', 'Handover & support'), text: t('تسليم مع ضمان ودعم بعد التسليم.', 'Handover with warranty and after-care.'), icon: 'shield' },
+        ],
+        settings: settings({ background: 'light' }),
+      },
+      { blockType: 'latestArticles', title: t('أحدث المقالات', 'Latest articles'), mode: 'latest', limit: 3, showViewAll: true, settings: settings() },
+      {
         blockType: 'testimonials',
         title: t('ماذا يقول عملاؤنا', 'What our clients say'),
         items: [
@@ -300,6 +399,26 @@ async function seed() {
         ],
         settings: settings({ background: 'light' }),
       },
+      {
+        blockType: 'team',
+        title: t('فريق القيادة', 'Leadership team'),
+        members: [
+          { name: t('اسم العضو', 'Team member'), role: t('المدير العام', 'General Manager'), photo: authorImg1 },
+          { name: t('اسم العضو', 'Team member'), role: t('مدير المشاريع', 'Projects Director'), photo: authorImg2 },
+          { name: t('اسم العضو', 'Team member'), role: t('المدير الفني', 'Technical Director') },
+          { name: t('اسم العضو', 'Team member'), role: t('مدير المبيعات', 'Sales Manager') },
+        ],
+        settings: settings(),
+      },
+      {
+        blockType: 'video',
+        title: t('شاهد طريقة عملنا', 'See how we work'),
+        // Placeholder: "Big Buck Bunny" (Blender Foundation, CC BY). Replace with the client's own video.
+        url: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+        poster: heroImg,
+        settings: settings({ background: 'light' }),
+      },
+      { blockType: 'brochure', title: t('حمّل الملف التعريفي', 'Download our company profile'), document: brochureDoc.id, settings: settings() },
       { blockType: 'cta', headline: t('لنعمل معاً', "Let's work together"), button: quoteBtn, settings: settings({ background: 'dark' }) },
     ],
   })
@@ -335,6 +454,7 @@ async function seed() {
       { link: link('pages', about.id, 'من نحن', 'About') },
       { link: custom('/services', 'الخدمات', 'Services'), children: serviceDefs.slice(0, 4).map((s, i) => ({ link: link('services', services[i], s.ar, s.en) })) },
       { link: custom('/projects', 'المشاريع', 'Projects') },
+      { link: custom('/blog', 'المدونة', 'Blog') },
       { link: link('pages', contact.id, 'تواصل معنا', 'Contact') },
     ],
     showQuoteButton: true,
@@ -343,7 +463,7 @@ async function seed() {
   await updateGlobalBi(payload, 'footer', {
     about: t('شركة النموذج – نص تجريبي يصف الشركة في سطرين، يُستبدل بالوصف المعتمد.', 'Example Company – a two-line placeholder description, to be replaced with the approved text.'),
     columns: [
-      { title: t('الشركة', 'Company'), links: [{ link: link('pages', about.id, 'من نحن', 'About') }, { link: custom('/projects', 'المشاريع', 'Projects') }, { link: link('pages', contact.id, 'تواصل معنا', 'Contact') }] },
+      { title: t('الشركة', 'Company'), links: [{ link: link('pages', about.id, 'من نحن', 'About') }, { link: custom('/projects', 'المشاريع', 'Projects') }, { link: custom('/blog', 'المدونة', 'Blog') }, { link: link('pages', contact.id, 'تواصل معنا', 'Contact') }] },
       { title: t('الخدمات', 'Services'), links: serviceDefs.slice(0, 4).map((s, i) => ({ link: link('services', services[i], s.ar, s.en) })) },
     ],
     legalLinks: [{ link: link('pages', privacy.id, 'سياسة الخصوصية', 'Privacy policy') }, { link: link('pages', terms.id, 'الشروط والأحكام', 'Terms') }],
@@ -373,6 +493,7 @@ async function seed() {
     leadRecipients: [{ email: adminEmail }],
     spamAlertThreshold: 30,
     editorsCanPublish: false,
+    newsletterEnabled: true,
   })
 
   payload.logger.info(`Seed complete. Dashboard: /admin  (login: ${adminEmail})`)

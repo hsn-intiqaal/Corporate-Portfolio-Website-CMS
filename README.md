@@ -25,11 +25,24 @@ A bilingual (Arabic RTL / English LTR) corporate website with a secure content d
 - Contact and quotation forms: server-side validation, honeypot, minimum fill time, DB-backed rate limit
   (5 per 10 min per hashed IP), Cloudflare Turnstile, private attachments (JPG/PNG/PDF, signature-checked,
   renamed), email notification that includes the visitor's language, and an unusual-volume alert
-- WhatsApp button, optional Google Analytics that loads only after cookie consent
+- **Blog / articles**: categories, authors, tags, reading time, table of contents with heading anchors, share buttons,
+  author box, related articles and services, crawlable pagination (`/blog/page/2`), category pages, RSS per language
+  (`/ar/feed.xml`, `/en/feed.xml`), BlogPosting + BreadcrumbList structured data, Open Graph article tags
+- **Site search** (`/search`) over services, projects, articles and pages in the visitor's language (noindex),
+  plus WebSite/SearchAction structured data
+- **Newsletter** with double opt-in (confirmation email, unsubscribe link), footer signup and a section block, CSV export
+- **Brochure / company-profile download** gated by a short form (creates a lead) with signed, expiring links;
+  files are never publicly listable
+- **CRM / automation webhook**: new leads and confirmed subscribers are POSTed as signed JSON (HubSpot, Zoho, Zapier, Make, n8n)
+- **Third-party scripts** (live chat, tag manager, pixels) managed from the dashboard; consent-gated ones wait for cookie consent
+- WhatsApp button, optional Google Analytics that loads only after cookie consent, web app manifest, image sitemap entries
 
 **Dashboard** (`/admin`)
-- Home panel: new and in-progress enquiries, drafts, latest leads, shortcuts
-- Pages built from 12 section types (add, reorder, duplicate, hide, remove) with per-section background and spacing
+- Home panel: enquiries chart (last 6 months), **SEO health** list (published items missing an SEO title or description, per language), drafts, latest leads, shortcuts
+- Articles, article categories and authors; downloadable documents; newsletter subscribers; rich text with tables
+- Pages built from 18 section types (hero, text & image, service cards, project gallery, project highlight, statistics,
+  testimonials, partners, FAQ, call to action, contact, rich text, latest articles, team, process steps, video,
+  newsletter, brochure download): add, reorder, duplicate, hide, remove, with per-section background and spacing
 - Services (drag to order), Projects (gallery, categories, facts), Media library (required alt text, focal point, auto sizes)
 - Header and footer menus, which only link to published pages
 - Branding and settings: logo, approved colour palettes, contacts, social, map, SEO defaults, translation rule, lead recipients

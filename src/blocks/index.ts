@@ -359,6 +359,122 @@ export const RichTextBlock: Block = {
   ],
 }
 
+export const LatestArticlesBlock: Block = {
+  slug: 'latestArticles',
+  labels: { singular: 'Latest articles', plural: 'Latest articles' },
+  interfaceName: 'LatestArticlesBlock',
+  fields: [
+    heading(),
+    intro,
+    {
+      name: 'mode',
+      type: 'radio',
+      defaultValue: 'latest',
+      options: [
+        { label: 'Latest articles', value: 'latest' },
+        { label: 'Featured articles', value: 'featured' },
+        { label: 'By category', value: 'category' },
+        { label: 'Pick articles', value: 'selected' },
+      ],
+    },
+    { name: 'articles', type: 'relationship', relationTo: 'articles', hasMany: true, admin: { condition: (_, s) => s?.mode === 'selected' } },
+    { name: 'categories', type: 'relationship', relationTo: 'article-categories', hasMany: true, admin: { condition: (_, s) => s?.mode === 'category' } },
+    { name: 'limit', type: 'number', defaultValue: 3, min: 1, max: 12 },
+    { name: 'showViewAll', type: 'checkbox', defaultValue: true, label: 'Show "View all" link' },
+    sectionSettings,
+  ],
+}
+
+export const TeamBlock: Block = {
+  slug: 'team',
+  labels: { singular: 'Team', plural: 'Team' },
+  interfaceName: 'TeamBlock',
+  fields: [
+    heading(),
+    intro,
+    {
+      name: 'members',
+      type: 'array',
+      minRows: 1,
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'name', type: 'text', localized: true, required: true, admin: { width: '50%' } },
+            { name: 'role', type: 'text', localized: true, admin: { width: '50%' } },
+          ],
+        },
+        { name: 'photo', type: 'upload', relationTo: 'media' },
+        { name: 'bio', type: 'textarea', localized: true },
+        { name: 'linkedin', type: 'text' },
+      ],
+    },
+    sectionSettings,
+  ],
+}
+
+export const ProcessBlock: Block = {
+  slug: 'process',
+  labels: { singular: 'Process steps', plural: 'Process steps' },
+  interfaceName: 'ProcessBlock',
+  fields: [
+    heading(),
+    intro,
+    {
+      name: 'steps',
+      type: 'array',
+      minRows: 2,
+      maxRows: 8,
+      fields: [
+        { name: 'title', type: 'text', localized: true, required: true },
+        { name: 'text', type: 'textarea', localized: true },
+        { name: 'icon', type: 'select', options: [...iconOptions] },
+      ],
+    },
+    sectionSettings,
+  ],
+}
+
+export const VideoBlock: Block = {
+  slug: 'video',
+  labels: { singular: 'Video', plural: 'Videos' },
+  interfaceName: 'VideoBlock',
+  fields: [
+    heading(),
+    intro,
+    {
+      name: 'url',
+      type: 'text',
+      required: true,
+      admin: { description: 'YouTube or Vimeo link. The player loads only when the visitor clicks play (faster and privacy-friendly).' },
+      validate: (v: unknown) =>
+        (typeof v === 'string' && /^(https:\/\/)(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|vimeo\.com\/)/.test(v)) || 'Paste a YouTube or Vimeo URL',
+    },
+    { name: 'poster', type: 'upload', relationTo: 'media', admin: { description: 'Cover image shown before playing (recommended).' } },
+    sectionSettings,
+  ],
+}
+
+export const NewsletterBlock: Block = {
+  slug: 'newsletter',
+  labels: { singular: 'Newsletter signup', plural: 'Newsletter signups' },
+  interfaceName: 'NewsletterBlock',
+  fields: [heading(), intro, sectionSettings],
+}
+
+export const BrochureBlock: Block = {
+  slug: 'brochure',
+  labels: { singular: 'Download brochure', plural: 'Download brochures' },
+  interfaceName: 'BrochureBlock',
+  fields: [
+    heading(),
+    intro,
+    { name: 'document', type: 'upload', relationTo: 'documents', required: true },
+    { name: 'image', type: 'upload', relationTo: 'media', admin: { description: 'Optional cover image of the brochure' } },
+    sectionSettings,
+  ],
+}
+
 export const sectionBlocks: Block[] = [
   HeroBlock,
   TextImageBlock,
@@ -372,4 +488,10 @@ export const sectionBlocks: Block[] = [
   CTABlock,
   ContactBlock,
   RichTextBlock,
+  LatestArticlesBlock,
+  TeamBlock,
+  ProcessBlock,
+  VideoBlock,
+  NewsletterBlock,
+  BrochureBlock,
 ]

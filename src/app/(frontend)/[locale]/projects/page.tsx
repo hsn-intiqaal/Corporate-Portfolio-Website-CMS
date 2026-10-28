@@ -41,7 +41,7 @@ export default async function ProjectsPage({ params }: Props) {
             emptyLabel={t.noProjects}
           >
             {projects.map((p) => (
-              <ProjectCard key={p.id} project={p} locale={locale} numerals={numerals} />
+              <ProjectCard key={p.id} project={p} locale={locale} numerals={numerals} as="h2" />
             ))}
           </ProjectFilter>
         </div>

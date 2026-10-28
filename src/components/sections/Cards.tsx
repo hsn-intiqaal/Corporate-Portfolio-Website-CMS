@@ -8,7 +8,7 @@ import { docPath } from '@/lib/paths'
 import { Icon } from '../site/Icon'
 import { Media } from '../site/Media'
 
-export function ServiceCard({ service, locale, showExcerpt = true }: { service: Service; locale: Locale; showExcerpt?: boolean }) {
+export function ServiceCard({ service, locale, showExcerpt = true, as: Heading = 'h3' }: { service: Service; locale: Locale; showExcerpt?: boolean; as?: 'h2' | 'h3' }) {
   const t = getDictionary(locale)
   const href = docPath('services', service.slug, locale)
   const hasImage = service.image && typeof service.image === 'object'
@@ -23,11 +23,11 @@ export function ServiceCard({ service, locale, showExcerpt = true }: { service: 
             <Icon name={service.icon} className="size-6" />
           </span>
         )}
-        <h3 className="text-xl">
+        <Heading className="text-xl">
           <Link href={href} className="after:absolute after:inset-0 focus:outline-none">
             {service.title}
           </Link>
-        </h3>
+        </Heading>
         {showExcerpt && service.excerpt && <p className="mt-3 flex-1 text-muted">{service.excerpt}</p>}
         <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
           {t.viewService} <Icon name="arrow" className="size-4" />
@@ -37,7 +37,7 @@ export function ServiceCard({ service, locale, showExcerpt = true }: { service: 
   )
 }
 
-export function ProjectCard({ project, locale, numerals }: { project: Project; locale: Locale; numerals: NumeralStyle }) {
+export function ProjectCard({ project, locale, numerals, as: Heading = 'h3' }: { project: Project; locale: Locale; numerals: NumeralStyle; as?: 'h2' | 'h3' }) {
   const href = docPath('projects', project.slug, locale)
   const category = project.categories?.find((c) => typeof c === 'object')
   return (
@@ -46,11 +46,11 @@ export function ProjectCard({ project, locale, numerals }: { project: Project; l
       <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent" aria-hidden />
       <div className="absolute inset-x-0 bottom-0 p-5">
         {category && typeof category === 'object' && <span className="mb-2 inline-block rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur">{category.title}</span>}
-        <h3 className="text-lg text-white">
+        <Heading className="text-lg text-white">
           <Link href={href} className="after:absolute after:inset-0 focus:outline-none">
             {project.title}
           </Link>
-        </h3>
+        </Heading>
         <p className="mt-1 flex flex-wrap gap-x-3 text-sm text-white/75">
           {project.location && <span>{project.location}</span>}
           {project.completedAt && <span>{formatMonthYear(project.completedAt, locale, numerals)}</span>}

@@ -20,6 +20,8 @@ const paths: Record<string, React.ReactNode> = {
   mail: (<><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 6L2 7" /></>),
   pin: (<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></>),
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+  search: (<><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></>),
+  rss: (<><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" /><circle cx="5" cy="19" r="1" /></>),
   close: <path d="M18 6 6 18M6 6l12 12" />,
   whatsapp: <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.4zM9 9.5c.5 2 2.5 4 4.5 4.5l1-1.2 2 .9-.4 1.8c-3.6.3-7.9-4-7.6-7.6l1.8-.4.9 2z" />,
   quote: <path d="M3 21c3 0 7-1 7-8V5H3v8h4c0 4-2 5-4 5zm11 0c3 0 7-1 7-8V5h-7v8h4c0 4-2 5-4 5z" />,

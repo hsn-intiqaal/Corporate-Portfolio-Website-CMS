@@ -6,6 +6,7 @@ node_modules
 !.env.example
 media
 lead-files
+documents
 backups
 test-results
 playwright-report

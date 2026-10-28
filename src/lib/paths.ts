@@ -1,12 +1,13 @@
 import type { Locale } from '@/i18n/config'
 
-export type LinkableCollection = 'pages' | 'services' | 'projects'
+export type LinkableCollection = 'pages' | 'services' | 'projects' | 'articles'
 
 /** Public URL path of a document. Slugs are shared across languages. */
 export const docPath = (collection: LinkableCollection, slug: string | null | undefined, locale: Locale): string => {
   if (!slug) return `/${locale}`
   if (collection === 'services') return `/${locale}/services/${slug}`
   if (collection === 'projects') return `/${locale}/projects/${slug}`
+  if (collection === 'articles') return `/${locale}/blog/${slug}`
   return slug === 'home' ? `/${locale}` : `/${locale}/${slug}`
 }
 

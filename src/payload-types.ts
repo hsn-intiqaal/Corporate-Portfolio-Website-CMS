@@ -71,9 +71,14 @@ export interface Config {
     services: Service;
     projects: Project;
     'project-categories': ProjectCategory;
+    articles: Article;
+    'article-categories': ArticleCategory;
+    authors: Author;
     media: Media;
+    documents: Document;
     leads: Lead;
     'lead-files': LeadFile;
+    subscribers: Subscriber;
     users: User;
     'audit-logs': AuditLog;
     redirects: Redirect;
@@ -89,9 +94,14 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'project-categories': ProjectCategoriesSelect<false> | ProjectCategoriesSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    'article-categories': ArticleCategoriesSelect<false> | ArticleCategoriesSelect<true>;
+    authors: AuthorsSelect<false> | AuthorsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    documents: DocumentsSelect<false> | DocumentsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     'lead-files': LeadFilesSelect<false> | LeadFilesSelect<true>;
+    subscribers: SubscribersSelect<false> | SubscribersSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -175,6 +185,12 @@ export interface Page {
         | CTABlock
         | ContactBlock
         | RichTextBlock
+        | LatestArticlesBlock
+        | TeamBlock
+        | ProcessBlock
+        | VideoBlock
+        | NewsletterBlock
+        | BrochureBlock
       )[]
     | null;
   meta?: {
@@ -228,6 +244,10 @@ export interface HeroBlock {
             | ({
                 relationTo: 'projects';
                 value: number | Project;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: number | Article;
               } | null);
           url?: string | null;
           appearance?: ('primary' | 'secondary') | null;
@@ -376,6 +396,12 @@ export interface Service {
         | CTABlock
         | ContactBlock
         | RichTextBlock
+        | LatestArticlesBlock
+        | TeamBlock
+        | ProcessBlock
+        | VideoBlock
+        | NewsletterBlock
+        | BrochureBlock
       )[]
     | null;
   meta?: {
@@ -447,6 +473,10 @@ export interface TextImageBlock {
       | ({
           relationTo: 'projects';
           value: number | Project;
+        } | null)
+      | ({
+          relationTo: 'articles';
+          value: number | Article;
         } | null);
     url?: string | null;
     appearance?: ('primary' | 'secondary') | null;
@@ -516,6 +546,12 @@ export interface Project {
         | CTABlock
         | ContactBlock
         | RichTextBlock
+        | LatestArticlesBlock
+        | TeamBlock
+        | ProcessBlock
+        | VideoBlock
+        | NewsletterBlock
+        | BrochureBlock
       )[]
     | null;
   meta?: {
@@ -799,6 +835,10 @@ export interface CTABlock {
       | ({
           relationTo: 'projects';
           value: number | Project;
+        } | null)
+      | ({
+          relationTo: 'articles';
+          value: number | Article;
         } | null);
     url?: string | null;
     appearance?: ('primary' | 'secondary') | null;
@@ -816,6 +856,106 @@ export interface CTABlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'cta';
+}
+/**
+ * Blog / news articles. Published articles appear at /ar/blog and /en/blog, in the sitemap and in the RSS feed.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: number;
+  title: string;
+  /**
+   * Summary for article cards, RSS and the default meta description.
+   */
+  excerpt?: string | null;
+  coverImage: number | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  layout?:
+    | (
+        | HeroBlock
+        | TextImageBlock
+        | ServiceCardsBlock
+        | ProjectGalleryBlock
+        | ProjectHighlightBlock
+        | StatsBlock
+        | TestimonialsBlock
+        | PartnersBlock
+        | FAQBlock
+        | CTABlock
+        | ContactBlock
+        | RichTextBlock
+        | LatestArticlesBlock
+        | TeamBlock
+        | ProcessBlock
+        | VideoBlock
+        | NewsletterBlock
+        | BrochureBlock
+      )[]
+    | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  /**
+   * Used in the URL. Generated from the English title if left empty. Changing it creates a redirect automatically.
+   */
+  slug: string;
+  /**
+   * Set automatically on first publish; can be back-dated.
+   */
+  publishedAt?: string | null;
+  author?: (number | null) | Author;
+  categories?: (number | ArticleCategory)[] | null;
+  /**
+   * Keywords: shown on the article, used by site search and as meta keywords.
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Leave empty to pick automatically from the same category.
+   */
+  relatedArticles?: (number | Article)[] | null;
+  relatedServices?: (number | Service)[] | null;
+  /**
+   * Minutes, calculated automatically.
+   */
+  readingTime?: number | null;
+  /**
+   * Show in "featured" sections on the homepage.
+   */
+  featured?: boolean | null;
+  /**
+   * Hidden items are removed from the website and sitemap but kept here.
+   */
+  archived?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -876,12 +1016,246 @@ export interface RichTextBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LatestArticlesBlock".
+ */
+export interface LatestArticlesBlock {
+  title?: string | null;
+  intro?: string | null;
+  mode?: ('latest' | 'featured' | 'category' | 'selected') | null;
+  articles?: (number | Article)[] | null;
+  categories?: (number | ArticleCategory)[] | null;
+  limit?: number | null;
+  showViewAll?: boolean | null;
+  settings?: {
+    hidden?: boolean | null;
+    background?: ('white' | 'light' | 'primary' | 'dark' | 'accent') | null;
+    spacing?: ('compact' | 'normal' | 'spacious') | null;
+    /**
+     * Optional ID for in-page links, e.g. "faq" makes #faq work.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'latestArticles';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-categories".
+ */
+export interface ArticleCategory {
+  id: number;
+  _order?: string | null;
+  title: string;
+  /**
+   * Shown on the category page and used as its meta description.
+   */
+  description?: string | null;
+  /**
+   * Used in the URL. Generated from the English title if left empty. Changing it creates a redirect automatically.
+   */
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamBlock".
+ */
+export interface TeamBlock {
+  title?: string | null;
+  intro?: string | null;
+  members?:
+    | {
+        name: string;
+        role?: string | null;
+        photo?: (number | null) | Media;
+        bio?: string | null;
+        linkedin?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    hidden?: boolean | null;
+    background?: ('white' | 'light' | 'primary' | 'dark' | 'accent') | null;
+    spacing?: ('compact' | 'normal' | 'spacious') | null;
+    /**
+     * Optional ID for in-page links, e.g. "faq" makes #faq work.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'team';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProcessBlock".
+ */
+export interface ProcessBlock {
+  title?: string | null;
+  intro?: string | null;
+  steps?:
+    | {
+        title: string;
+        text?: string | null;
+        icon?:
+          | (
+              | 'check'
+              | 'star'
+              | 'users'
+              | 'building'
+              | 'calendar'
+              | 'award'
+              | 'globe'
+              | 'tools'
+              | 'shield'
+              | 'clock'
+              | 'drop'
+              | 'leaf'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  settings?: {
+    hidden?: boolean | null;
+    background?: ('white' | 'light' | 'primary' | 'dark' | 'accent') | null;
+    spacing?: ('compact' | 'normal' | 'spacious') | null;
+    /**
+     * Optional ID for in-page links, e.g. "faq" makes #faq work.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'process';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoBlock".
+ */
+export interface VideoBlock {
+  title?: string | null;
+  intro?: string | null;
+  /**
+   * YouTube or Vimeo link. The player loads only when the visitor clicks play (faster and privacy-friendly).
+   */
+  url: string;
+  /**
+   * Cover image shown before playing (recommended).
+   */
+  poster?: (number | null) | Media;
+  settings?: {
+    hidden?: boolean | null;
+    background?: ('white' | 'light' | 'primary' | 'dark' | 'accent') | null;
+    spacing?: ('compact' | 'normal' | 'spacious') | null;
+    /**
+     * Optional ID for in-page links, e.g. "faq" makes #faq work.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'video';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsletterBlock".
+ */
+export interface NewsletterBlock {
+  title?: string | null;
+  intro?: string | null;
+  settings?: {
+    hidden?: boolean | null;
+    background?: ('white' | 'light' | 'primary' | 'dark' | 'accent') | null;
+    spacing?: ('compact' | 'normal' | 'spacious') | null;
+    /**
+     * Optional ID for in-page links, e.g. "faq" makes #faq work.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'newsletter';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BrochureBlock".
+ */
+export interface BrochureBlock {
+  title?: string | null;
+  intro?: string | null;
+  document: number | Document;
+  /**
+   * Optional cover image of the brochure
+   */
+  image?: (number | null) | Media;
+  settings?: {
+    hidden?: boolean | null;
+    background?: ('white' | 'light' | 'primary' | 'dark' | 'accent') | null;
+    spacing?: ('compact' | 'normal' | 'spacious') | null;
+    /**
+     * Optional ID for in-page links, e.g. "faq" makes #faq work.
+     */
+    anchor?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'brochure';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents".
+ */
+export interface Document {
+  id: number;
+  title: string;
+  description?: string | null;
+  /**
+   * Unchecked: anyone with the page can download directly.
+   */
+  gated?: boolean | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors".
+ */
+export interface Author {
+  id: number;
+  name: string;
+  role?: string | null;
+  photo?: (number | null) | Media;
+  bio?: string | null;
+  linkedin?: string | null;
+  /**
+   * Used in the URL. Generated from the English title if left empty. Changing it creates a redirect automatically.
+   */
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "leads".
  */
 export interface Lead {
   id: number;
   status: 'new' | 'in-progress' | 'closed';
-  type: 'contact' | 'quote';
+  type: 'contact' | 'quote' | 'brochure';
   locale?: ('ar' | 'en') | null;
   /**
    * Enquiry owner
@@ -898,6 +1272,7 @@ export interface Lead {
   budget?: string | null;
   message?: string | null;
   attachments?: (number | LeadFile)[] | null;
+  document?: (number | null) | Document;
   notes?:
     | {
         note: string;
@@ -972,6 +1347,23 @@ export interface LeadFile {
   focalY?: number | null;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscribers".
+ */
+export interface Subscriber {
+  id: number;
+  email: string;
+  name?: string | null;
+  status: 'pending' | 'confirmed' | 'unsubscribed';
+  locale?: ('ar' | 'en') | null;
+  confirmedAt?: string | null;
+  token?: string | null;
+  ipHash?: string | null;
+  source?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Logins, publishing, deletions, user and settings changes. Read-only.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1014,6 +1406,10 @@ export interface Redirect {
       | ({
           relationTo: 'projects';
           value: number | Project;
+        } | null)
+      | ({
+          relationTo: 'articles';
+          value: number | Article;
         } | null);
     url?: string | null;
   };
@@ -1154,8 +1550,24 @@ export interface PayloadLockedDocument {
         value: number | ProjectCategory;
       } | null)
     | ({
+        relationTo: 'articles';
+        value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'article-categories';
+        value: number | ArticleCategory;
+      } | null)
+    | ({
+        relationTo: 'authors';
+        value: number | Author;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'documents';
+        value: number | Document;
       } | null)
     | ({
         relationTo: 'leads';
@@ -1164,6 +1576,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'lead-files';
         value: number | LeadFile;
+      } | null)
+    | ({
+        relationTo: 'subscribers';
+        value: number | Subscriber;
       } | null)
     | ({
         relationTo: 'users';
@@ -1240,6 +1656,12 @@ export interface PagesSelect<T extends boolean = true> {
         cta?: T | CTABlockSelect<T>;
         contact?: T | ContactBlockSelect<T>;
         richText?: T | RichTextBlockSelect<T>;
+        latestArticles?: T | LatestArticlesBlockSelect<T>;
+        team?: T | TeamBlockSelect<T>;
+        process?: T | ProcessBlockSelect<T>;
+        video?: T | VideoBlockSelect<T>;
+        newsletter?: T | NewsletterBlockSelect<T>;
+        brochure?: T | BrochureBlockSelect<T>;
       };
   meta?:
     | T
@@ -1567,6 +1989,141 @@ export interface RichTextBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LatestArticlesBlock_select".
+ */
+export interface LatestArticlesBlockSelect<T extends boolean = true> {
+  title?: T;
+  intro?: T;
+  mode?: T;
+  articles?: T;
+  categories?: T;
+  limit?: T;
+  showViewAll?: T;
+  settings?:
+    | T
+    | {
+        hidden?: T;
+        background?: T;
+        spacing?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamBlock_select".
+ */
+export interface TeamBlockSelect<T extends boolean = true> {
+  title?: T;
+  intro?: T;
+  members?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        photo?: T;
+        bio?: T;
+        linkedin?: T;
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        hidden?: T;
+        background?: T;
+        spacing?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProcessBlock_select".
+ */
+export interface ProcessBlockSelect<T extends boolean = true> {
+  title?: T;
+  intro?: T;
+  steps?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        icon?: T;
+        id?: T;
+      };
+  settings?:
+    | T
+    | {
+        hidden?: T;
+        background?: T;
+        spacing?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoBlock_select".
+ */
+export interface VideoBlockSelect<T extends boolean = true> {
+  title?: T;
+  intro?: T;
+  url?: T;
+  poster?: T;
+  settings?:
+    | T
+    | {
+        hidden?: T;
+        background?: T;
+        spacing?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsletterBlock_select".
+ */
+export interface NewsletterBlockSelect<T extends boolean = true> {
+  title?: T;
+  intro?: T;
+  settings?:
+    | T
+    | {
+        hidden?: T;
+        background?: T;
+        spacing?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BrochureBlock_select".
+ */
+export interface BrochureBlockSelect<T extends boolean = true> {
+  title?: T;
+  intro?: T;
+  document?: T;
+  image?: T;
+  settings?:
+    | T
+    | {
+        hidden?: T;
+        background?: T;
+        spacing?: T;
+        anchor?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services_select".
  */
 export interface ServicesSelect<T extends boolean = true> {
@@ -1597,6 +2154,12 @@ export interface ServicesSelect<T extends boolean = true> {
         cta?: T | CTABlockSelect<T>;
         contact?: T | ContactBlockSelect<T>;
         richText?: T | RichTextBlockSelect<T>;
+        latestArticles?: T | LatestArticlesBlockSelect<T>;
+        team?: T | TeamBlockSelect<T>;
+        process?: T | ProcessBlockSelect<T>;
+        video?: T | VideoBlockSelect<T>;
+        newsletter?: T | NewsletterBlockSelect<T>;
+        brochure?: T | BrochureBlockSelect<T>;
       };
   meta?:
     | T
@@ -1645,6 +2208,12 @@ export interface ProjectsSelect<T extends boolean = true> {
         cta?: T | CTABlockSelect<T>;
         contact?: T | ContactBlockSelect<T>;
         richText?: T | RichTextBlockSelect<T>;
+        latestArticles?: T | LatestArticlesBlockSelect<T>;
+        team?: T | TeamBlockSelect<T>;
+        process?: T | ProcessBlockSelect<T>;
+        video?: T | VideoBlockSelect<T>;
+        newsletter?: T | NewsletterBlockSelect<T>;
+        brochure?: T | BrochureBlockSelect<T>;
       };
   meta?:
     | T
@@ -1673,6 +2242,90 @@ export interface ProjectsSelect<T extends boolean = true> {
 export interface ProjectCategoriesSelect<T extends boolean = true> {
   _order?: T;
   title?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles_select".
+ */
+export interface ArticlesSelect<T extends boolean = true> {
+  title?: T;
+  excerpt?: T;
+  coverImage?: T;
+  content?: T;
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        textImage?: T | TextImageBlockSelect<T>;
+        serviceCards?: T | ServiceCardsBlockSelect<T>;
+        projectGallery?: T | ProjectGalleryBlockSelect<T>;
+        projectHighlight?: T | ProjectHighlightBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        testimonials?: T | TestimonialsBlockSelect<T>;
+        partners?: T | PartnersBlockSelect<T>;
+        faq?: T | FAQBlockSelect<T>;
+        cta?: T | CTABlockSelect<T>;
+        contact?: T | ContactBlockSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
+        latestArticles?: T | LatestArticlesBlockSelect<T>;
+        team?: T | TeamBlockSelect<T>;
+        process?: T | ProcessBlockSelect<T>;
+        video?: T | VideoBlockSelect<T>;
+        newsletter?: T | NewsletterBlockSelect<T>;
+        brochure?: T | BrochureBlockSelect<T>;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  slug?: T;
+  publishedAt?: T;
+  author?: T;
+  categories?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  relatedArticles?: T;
+  relatedServices?: T;
+  readingTime?: T;
+  featured?: T;
+  archived?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-categories_select".
+ */
+export interface ArticleCategoriesSelect<T extends boolean = true> {
+  _order?: T;
+  title?: T;
+  description?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors_select".
+ */
+export interface AuthorsSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  photo?: T;
+  bio?: T;
+  linkedin?: T;
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1744,6 +2397,28 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents_select".
+ */
+export interface DocumentsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  gated?: T;
+  prefix?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "leads_select".
  */
 export interface LeadsSelect<T extends boolean = true> {
@@ -1762,6 +2437,7 @@ export interface LeadsSelect<T extends boolean = true> {
   budget?: T;
   message?: T;
   attachments?: T;
+  document?: T;
   notes?:
     | T
     | {
@@ -1795,6 +2471,22 @@ export interface LeadFilesSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscribers_select".
+ */
+export interface SubscribersSelect<T extends boolean = true> {
+  email?: T;
+  name?: T;
+  status?: T;
+  locale?: T;
+  confirmedAt?: T;
+  token?: T;
+  ipHash?: T;
+  source?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1951,6 +2643,10 @@ export interface Header {
             | ({
                 relationTo: 'projects';
                 value: number | Project;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: number | Article;
               } | null);
           url?: string | null;
         };
@@ -1972,6 +2668,10 @@ export interface Header {
                   | ({
                       relationTo: 'projects';
                       value: number | Project;
+                    } | null)
+                  | ({
+                      relationTo: 'articles';
+                      value: number | Article;
                     } | null);
                 url?: string | null;
               };
@@ -1998,6 +2698,10 @@ export interface Header {
       | ({
           relationTo: 'projects';
           value: number | Project;
+        } | null)
+      | ({
+          relationTo: 'articles';
+          value: number | Article;
         } | null);
     url?: string | null;
   };
@@ -2032,6 +2736,10 @@ export interface Footer {
                   | ({
                       relationTo: 'projects';
                       value: number | Project;
+                    } | null)
+                  | ({
+                      relationTo: 'articles';
+                      value: number | Article;
                     } | null);
                 url?: string | null;
               };
@@ -2059,6 +2767,10 @@ export interface Footer {
             | ({
                 relationTo: 'projects';
                 value: number | Project;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: number | Article;
               } | null);
           url?: string | null;
         };
@@ -2131,6 +2843,27 @@ export interface Setting {
   googleSiteVerification?: string | null;
   missingTranslation?: ('fallback' | 'hide') | null;
   arabicNumerals?: ('western' | 'eastern') | null;
+  /**
+   * New leads and confirmed newsletter subscribers are POSTed here as JSON (works with HubSpot, Zoho, Zapier, Make, n8n...). Each request is signed: header X-Signature = HMAC-SHA256(body, secret).
+   */
+  webhookUrl?: string | null;
+  /**
+   * Shared secret used to sign webhook requests.
+   */
+  webhookSecret?: string | null;
+  newsletterEnabled?: boolean | null;
+  /**
+   * Paste the vendor snippet. Scripts marked "needs consent" load only after the visitor accepts cookies. Only add code from trusted vendors.
+   */
+  customScripts?:
+    | {
+        name: string;
+        code: string;
+        placement?: ('body' | 'head') | null;
+        needsConsent?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
   leadRecipients?:
     | {
         email: string;
@@ -2268,6 +3001,18 @@ export interface SettingsSelect<T extends boolean = true> {
   googleSiteVerification?: T;
   missingTranslation?: T;
   arabicNumerals?: T;
+  webhookUrl?: T;
+  webhookSecret?: T;
+  newsletterEnabled?: T;
+  customScripts?:
+    | T
+    | {
+        name?: T;
+        code?: T;
+        placement?: T;
+        needsConsent?: T;
+        id?: T;
+      };
   leadRecipients?:
     | T
     | {
@@ -2310,6 +3055,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'projects';
           value: number | Project;
+        } | null)
+      | ({
+          relationTo: 'articles';
+          value: number | Article;
         } | null);
     global?: string | null;
     user?: {

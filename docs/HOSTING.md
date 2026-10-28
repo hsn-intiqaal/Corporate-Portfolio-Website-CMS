@@ -18,7 +18,7 @@ API. It needs four services:
 |---|---|---|
 | App server | Runs Next.js + Payload | Node.js 22.12+, a long-running or serverless runtime (static-only hosting cannot run the CMS) |
 | PostgreSQL | Content, users, leads | PostgreSQL 15+ with daily backups |
-| Object storage | Images and lead attachments | Any S3-compatible bucket (required on Vercel; optional on a VPS) |
+| Object storage | Images, brochures and lead attachments | Any S3-compatible bucket (required on Vercel; optional on a VPS) |
 | Email (SMTP) | Lead notifications | Transactional provider with SPF/DKIM on the client's domain |
 
 Public pages are pre-rendered and cached. They are refreshed automatically when an editor publishes,

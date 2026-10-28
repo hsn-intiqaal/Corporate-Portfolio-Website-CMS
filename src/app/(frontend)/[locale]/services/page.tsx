@@ -34,7 +34,7 @@ export default async function ServicesPage({ params }: Props) {
         <div className="container-site grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {services.map((s) => (
             <div key={s.id} className="relative">
-              <ServiceCard service={s} locale={locale} />
+              <ServiceCard service={s} locale={locale} as="h2" />
             </div>
           ))}
         </div>

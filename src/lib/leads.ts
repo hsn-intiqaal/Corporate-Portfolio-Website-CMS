@@ -9,6 +9,8 @@ export type LeadFormState = {
   status: 'idle' | 'success' | 'error'
   message?: string
   errors?: Partial<Record<string, string>>
+  /** Signed, time-limited link returned after a brochure request. */
+  downloadUrl?: string
 }
 
 type ErrorKey = 'required' | 'invalidEmail' | 'invalidPhone' | 'tooLong' | 'fileType' | 'fileSize' | 'fileCount'
@@ -20,14 +22,14 @@ const MAX_FILES = 3
 // Serverless hosts cap request bodies (Vercel: 4.5 MB), so the total is configurable.
 const MAX_TOTAL_UPLOAD = Number(process.env.LEAD_UPLOAD_TOTAL_MB || 15) * 1024 * 1024
 
-const str = (fd: FormData, key: string, max = 200) => {
+export const str = (fd: FormData, key: string, max = 200) => {
   const v = fd.get(key)
   return typeof v === 'string' ? v.trim().slice(0, max + 1) : ''
 }
 
-const hashIp = (ip: string) => crypto.createHmac('sha256', process.env.PAYLOAD_SECRET || 'salt').update(ip).digest('hex').slice(0, 32)
+export const hashIp = (ip: string) => crypto.createHmac('sha256', process.env.PAYLOAD_SECRET || 'salt').update(ip).digest('hex').slice(0, 32)
 
-async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+export async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY
   if (!secret) return true // challenge not configured (development)
   if (!token) return false
@@ -49,13 +51,18 @@ async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
  * honeypot + minimum fill time + rate limit (per hashed IP, stored in the DB so it works on
  * serverless hosting) + optional Cloudflare Turnstile, then saves the lead and its private files.
  */
-export async function handleLeadSubmission(formData: FormData, messages: (key: ErrorKey | ResultKey) => string): Promise<LeadFormState> {
-  const payload = await getPayloadClient()
+export async function clientIp() {
   const h = await headers()
   const ip = h.get('cf-connecting-ip') || h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || '0.0.0.0'
-  const ipHash = hashIp(ip)
+  return { ip, ipHash: hashIp(ip), userAgent: (h.get('user-agent') || '').slice(0, 300) }
+}
 
-  const type = str(formData, 'type') === 'quote' ? 'quote' : 'contact'
+export async function handleLeadSubmission(formData: FormData, messages: (key: ErrorKey | ResultKey) => string): Promise<LeadFormState> {
+  const payload = await getPayloadClient()
+  const { ip, ipHash, userAgent } = await clientIp()
+
+  const rawType = str(formData, 'type')
+  const type = rawType === 'quote' || rawType === 'brochure' ? rawType : 'contact'
   const localeRaw = str(formData, 'locale')
   const locale: Locale = isLocale(localeRaw) ? localeRaw : 'ar'
 
@@ -91,7 +98,7 @@ export async function handleLeadSubmission(formData: FormData, messages: (key: E
   const limits: Record<string, number> = { name: 120, email: 160, phone: 40, company: 160, subject: 200, message: 5000, projectLocation: 200, timeline: 100, budget: 100 }
 
   const errors: Record<string, string> = {}
-  const required = type === 'quote' ? ['name', 'email', 'phone', 'service', 'message'] : ['name', 'email', 'message']
+  const required = type === 'quote' ? ['name', 'email', 'phone', 'service', 'message'] : type === 'brochure' ? ['name', 'email'] : ['name', 'email', 'message']
   for (const key of required) if (!data[key as keyof typeof data]) errors[key] = messages('required')
   for (const [key, max] of Object.entries(limits)) if ((data[key as keyof typeof data] ?? '').length > max) errors[key] = messages('tooLong')
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email)) errors.email = messages('invalidEmail')
@@ -112,6 +119,14 @@ export async function handleLeadSubmission(formData: FormData, messages: (key: E
     const exists = Number.isInteger(id) && (await payload.count({ collection: 'services', where: { id: { equals: id } }, overrideAccess: true })).totalDocs > 0
     if (exists) serviceId = id
     else if (type === 'quote') errors.service = messages('required')
+  }
+
+  let documentId: number | undefined
+  if (type === 'brochure') {
+    const id = Number(str(formData, 'document', 20))
+    const doc = Number.isInteger(id) ? await payload.findByID({ collection: 'documents', id, depth: 0, overrideAccess: true }).catch(() => null) : null
+    if (!doc) return { status: 'error', message: messages('error') }
+    documentId = doc.id
   }
 
   if (Object.keys(errors).length > 0) return { status: 'error', errors, message: messages('error') }
@@ -157,15 +172,20 @@ export async function handleLeadSubmission(formData: FormData, messages: (key: E
         budget: data.budget || undefined,
         service: serviceId,
         attachments: attachmentIds,
+        document: documentId,
         consent: true,
         ipHash,
-        userAgent: (h.get('user-agent') || '').slice(0, 300),
+        userAgent,
         sourcePage: str(formData, 'sourcePage', 300),
       },
       overrideAccess: true,
     })
 
     await maybeSendSpamAlert(ipHash)
+    if (documentId) {
+      const { signToken } = await import('./signing')
+      return { status: 'success', message: messages('success'), downloadUrl: `/next/download/${signToken(documentId)}` }
+    }
     return { status: 'success', message: messages('success') }
   } catch (error) {
     payload.logger.error({ err: error, msg: 'Failed to save lead' })

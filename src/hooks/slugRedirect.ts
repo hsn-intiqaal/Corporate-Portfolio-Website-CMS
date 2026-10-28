@@ -1,7 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionSlug } from 'payload'
 import { locales } from '@/i18n/config'
 
-const prefixFor: Record<string, string> = { pages: '', services: '/services', projects: '/projects' }
+const prefixFor: Record<string, string> = { pages: '', services: '/services', projects: '/projects', articles: '/blog' }
 
 /**
  * When a document is published with a different slug than its previous published version,

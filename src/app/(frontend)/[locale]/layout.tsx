@@ -8,6 +8,7 @@ import { Footer } from '@/components/site/Footer'
 import { Header } from '@/components/site/Header'
 import { Icon } from '@/components/site/Icon'
 import { JsonLd } from '@/components/site/JsonLd'
+import { ThirdPartyScripts } from '@/components/site/ThirdPartyScripts'
 import { DraftBanner } from '@/components/site/Notices'
 import { brandPalettes, type BrandPalette } from '@/fields/palette'
 import { dir, isLocale, locales } from '@/i18n/config'
@@ -59,6 +60,16 @@ export default async function LocaleLayout({ children, params }: Props) {
     sameAs: (settings.social ?? []).map((s) => s.url),
   }
   const gaId = process.env.NEXT_PUBLIC_GA_ID
+  const snippets = (settings.customScripts ?? []).map((s, i) => ({ id: s.id ?? String(i), code: s.code, placement: s.placement ?? 'body', needsConsent: s.needsConsent !== false }))
+  const needsBanner = Boolean(gaId) || snippets.some((s) => s.needsConsent)
+  const websiteLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: settings.siteName,
+    url: absoluteURL(`/${locale}`),
+    inLanguage: locale,
+    potentialAction: { '@type': 'SearchAction', target: `${absoluteURL(`/${locale}/search`)}?q={search_term_string}`, 'query-input': 'required name=search_term_string' },
+  }
 
   return (
     <html lang={locale} dir={dir(locale)} className={`${latin.variable} ${arabic.variable}`}>
@@ -86,8 +97,9 @@ export default async function LocaleLayout({ children, params }: Props) {
             <Icon name="whatsapp" className="size-7" />
           </a>
         )}
-        <JsonLd data={orgLd} />
-        {gaId && <ConsentAnalytics gaId={gaId} text={t.cookieText} accept={t.accept} decline={t.decline} />}
+        <JsonLd data={[orgLd, websiteLd]} />
+        {needsBanner && <ConsentAnalytics gaId={gaId} text={t.cookieText} accept={t.accept} decline={t.decline} />}
+        {snippets.length > 0 && <ThirdPartyScripts snippets={snippets} />}
       </body>
     </html>
   )

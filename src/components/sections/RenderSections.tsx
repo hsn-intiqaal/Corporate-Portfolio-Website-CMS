@@ -2,18 +2,24 @@ import React from 'react'
 import type { Page } from '@/payload-types'
 import type { Locale } from '@/i18n/config'
 import type { NumeralStyle } from '@/lib/format'
+import { Brochure } from './Brochure'
 import { Contact } from './Contact'
 import { CTA } from './CTA'
 import { FAQ } from './FAQ'
 import { Hero } from './Hero'
+import { LatestArticles } from './LatestArticles'
+import { Newsletter } from './Newsletter'
 import { Partners } from './Partners'
+import { Process } from './Process'
 import { ProjectGallery } from './ProjectGallery'
 import { ProjectHighlight } from './ProjectHighlight'
 import { RichTextSection } from './RichTextSection'
 import { ServiceCards } from './ServiceCards'
 import { Stats } from './Stats'
 import { Testimonials } from './Testimonials'
+import { Team } from './Team'
 import { TextImage } from './TextImage'
+import { Video } from './Video'
 
 type Props = {
   sections?: Page['layout']
@@ -54,6 +60,18 @@ export function RenderSections({ sections, locale, numerals, firstIsPageHeading 
             return <Contact key={key} block={block} locale={locale} />
           case 'richText':
             return <RichTextSection key={key} block={block} locale={locale} />
+          case 'latestArticles':
+            return <LatestArticles key={key} block={block} locale={locale} numerals={numerals} />
+          case 'team':
+            return <Team key={key} block={block} />
+          case 'process':
+            return <Process key={key} block={block} locale={locale} numerals={numerals} />
+          case 'video':
+            return <Video key={key} block={block} locale={locale} />
+          case 'newsletter':
+            return <Newsletter key={key} block={block} locale={locale} />
+          case 'brochure':
+            return <Brochure key={key} block={block} locale={locale} />
           default:
             return null
         }

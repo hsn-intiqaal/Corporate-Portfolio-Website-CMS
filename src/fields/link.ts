@@ -1,6 +1,6 @@
 import type { Condition, Field, GroupField, Validate } from 'payload'
 
-export const linkableCollections = ['pages', 'services', 'projects'] as const
+export const linkableCollections = ['pages', 'services', 'projects', 'articles'] as const
 
 const requireTarget: Validate = (_value, { siblingData }) => {
   const s = siblingData as { type?: string; reference?: unknown; url?: string }

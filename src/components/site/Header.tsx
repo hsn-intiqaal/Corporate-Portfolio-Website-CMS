@@ -67,6 +67,9 @@ export async function Header({ locale }: { locale: Locale }) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <Link href={`/${locale}/search`} className="rounded-md p-2 hover:bg-black/5" aria-label={t.search}>
+            <Icon name="search" className="size-5" />
+          </Link>
           <Suspense fallback={null}>
             <LanguageSwitcher locale={locale} />
           </Suspense>

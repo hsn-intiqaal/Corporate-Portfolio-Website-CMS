@@ -1,4 +1,5 @@
 import type { CollectionAfterChangeHook } from 'payload'
+import { sendWebhook } from '@/lib/webhook'
 
 const escape = (v: unknown) =>
   String(v ?? '')
@@ -11,6 +12,12 @@ const escape = (v: unknown) =>
 export const notifyNewLead: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
   if (operation !== 'create') return doc
   const { payload } = req
+  await sendWebhook(payload, 'lead.created', {
+    id: doc.id, type: doc.type, locale: doc.locale, name: doc.name, email: doc.email, phone: doc.phone, company: doc.company,
+    subject: doc.subject, message: doc.message, service: doc.service, projectLocation: doc.projectLocation, timeline: doc.timeline,
+    budget: doc.budget, sourcePage: doc.sourcePage, createdAt: doc.createdAt,
+    adminUrl: `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/admin/collections/leads/${doc.id}`,
+  })
   try {
     const settings = await payload.findGlobal({ slug: 'settings', depth: 0, req, overrideAccess: true })
     const staff = await payload.find({
@@ -38,7 +45,7 @@ export const notifyNewLead: CollectionAfterChangeHook = async ({ doc, operation,
     }
 
     const language = doc.locale === 'ar' ? 'Arabic (العربية)' : 'English'
-    const kind = doc.type === 'quote' ? 'Quotation request' : 'Contact message'
+    const kind = doc.type === 'quote' ? 'Quotation request' : doc.type === 'brochure' ? 'Brochure download' : 'Contact message'
     const rows: [string, unknown][] = [
       ['Type', kind],
       ['Visitor language', language],

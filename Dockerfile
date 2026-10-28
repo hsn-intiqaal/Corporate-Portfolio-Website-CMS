@@ -25,7 +25,7 @@ RUN pnpm build && pnpm prune --prod --ignore-scripts
 
 FROM base AS runner
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
-RUN groupadd --system app && useradd --system --gid app app && mkdir -p /app/media /app/lead-files && chown app:app /app/media /app/lead-files
+RUN groupadd --system app && useradd --system --gid app app && mkdir -p /app/media /app/lead-files /app/documents && chown app:app /app/media /app/lead-files /app/documents
 COPY --from=build --chown=app:app /app/package.json /app/next.config.mjs /app/tsconfig.json ./
 COPY --from=build --chown=app:app /app/node_modules ./node_modules
 COPY --from=build --chown=app:app /app/.next ./.next

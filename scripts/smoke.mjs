@@ -5,7 +5,7 @@ const checks = []
 const check = (name, fn) => checks.push({ name, fn })
 const get = (path, init) => fetch(base + path, { redirect: 'manual', ...init })
 
-for (const path of ['/ar', '/en', '/ar/services', '/en/projects', '/en/contact', '/ar/request-a-quote']) {
+for (const path of ['/ar', '/en', '/ar/services', '/en/projects', '/en/contact', '/ar/request-a-quote', '/ar/blog', '/en/blog']) {
   check(`GET ${path} is 200`, async () => {
     const r = await get(path)
     if (r.status !== 200) throw new Error(`status ${r.status}`)
@@ -30,15 +30,34 @@ check('sitemap.xml lists both languages', async () => {
   const xml = await (await get('/sitemap.xml')).text()
   if (!xml.includes('/ar') || !xml.includes('/en')) throw new Error('missing locales')
 })
+check('RSS feeds are valid XML with items', async () => {
+  for (const l of ['ar', 'en']) {
+    const r = await get(`/${l}/feed.xml`)
+    const xml = await r.text()
+    if (r.status !== 200 || !xml.includes('<rss')) throw new Error(`/${l}/feed.xml returned ${r.status}`)
+  }
+})
+check('Search works and is not indexed', async () => {
+  const html = await (await get('/en/search?q=a')).text()
+  if (!/<meta name="robots" content="noindex/.test(html)) throw new Error('search page is indexable')
+})
+check('Web app manifest is served', async () => {
+  const r = await get('/manifest.webmanifest')
+  if (r.status !== 200) throw new Error(`status ${r.status}`)
+})
 check('robots.txt is served', async () => {
   const r = await get('/robots.txt')
   if (r.status !== 200) throw new Error(`status ${r.status}`)
 })
 check('Leads are not public', async () => {
-  for (const path of ['/api/leads', '/api/lead-files', '/api/leads/export-csv', '/api/audit-logs']) {
+  for (const path of ['/api/leads', '/api/lead-files', '/api/leads/export-csv', '/api/audit-logs', '/api/subscribers', '/api/documents', '/api/subscribers/export-csv']) {
     const r = await get(path)
     if (r.status !== 403 && r.status !== 401) throw new Error(`${path} returned ${r.status}`)
   }
+})
+check('Forged download links are rejected', async () => {
+  const r = await get('/next/download/1.9999999999.forged')
+  if (r.status !== 410) throw new Error(`status ${r.status}`)
 })
 check('Dashboard login page loads', async () => {
   const r = await get('/admin/login')

@@ -2,10 +2,11 @@
 import Script from 'next/script'
 import React, { useEffect, useState } from 'react'
 
-const KEY = 'analytics-consent'
+import { CONSENT_EVENT, CONSENT_KEY as KEY } from './ThirdPartyScripts'
 
 /** Loads Google Analytics only after the visitor accepts. Rendered only when NEXT_PUBLIC_GA_ID is set. */
-export function ConsentAnalytics({ gaId, text, accept, decline }: { gaId: string; text: string; accept: string; decline: string }) {
+/** Cookie consent banner. Loads Google Analytics (when configured) and consent-gated third-party scripts only after the visitor accepts. */
+export function ConsentAnalytics({ gaId, text, accept, decline }: { gaId?: string; text: string; accept: string; decline: string }) {
   const [consent, setConsent] = useState<'granted' | 'denied' | null>(null)
   const [ready, setReady] = useState(false)
   useEffect(() => {
@@ -20,10 +21,11 @@ export function ConsentAnalytics({ gaId, text, accept, decline }: { gaId: string
     try {
       localStorage.setItem(KEY, v)
     } catch {}
+    window.dispatchEvent(new Event(CONSENT_EVENT))
   }
   return (
     <>
-      {consent === 'granted' && (
+      {consent === 'granted' && gaId && (
         <>
           <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
           <Script id="ga" strategy="afterInteractive">

@@ -21,12 +21,18 @@ the top of each edit screen chooses which language you are typing in.
 | Upload images | Media → **Create new**. **Alt text is required** (describe the image for screen readers and Google) |
 | Change menus | Navigation → Header menu / Footer |
 | Change phone, email, logo, colours | Administration → Branding & settings (administrators) |
+| Write an article | Articles → **Create new**: title, summary, cover image, content (use *Heading 2/3* so the table of contents is built automatically), category, author and tags in the sidebar. Publishing sets the date automatically |
+| Add a brochure / company profile | Downloadable documents → upload the PDF, then add a **Download brochure** section to any page |
+| Newsletter list | Leads → Newsletter subscribers (administrators) → **Export confirmed subscribers (CSV)** and import it into your email tool |
+| Live chat, tag manager, pixels | Branding & settings → Integrations → Third-party scripts (administrators) |
+| Connect a CRM | Branding & settings → Integrations → webhook URL and secret (administrators) |
 | Handle enquiries | Leads (administrators): set the status to *In progress* or *Closed* and add notes. Use **Export CSV** for Excel |
 
 ## Building a page from sections
 Open a page → **Content** tab → **Add Layout** and choose a section:
 Hero banner · Text and image · Service cards · Project gallery · Project highlight · Statistics ·
-Testimonials · Partner logos · FAQ · Call to action · Contact section · Rich text.
+Testimonials · Partner logos · FAQ · Call to action · Contact section · Rich text · Latest articles · Team ·
+Process steps · Video · Newsletter signup · Download brochure.
 - Use the **⋮** menu on a section to duplicate, move or remove it, or drag it by its handle.
 - **Section settings** on every section: *Hide this section* (keeps it without showing it), background colour, spacing.
 - Statistics must use verified figures only.
@@ -41,7 +47,9 @@ Testimonials · Partner logos · FAQ · Call to action · Contact section · Ric
   otherwise editors save drafts and an administrator publishes.
 
 ## SEO tab
-Each page, service and project has an **SEO** tab per language: title (about 50–60 characters),
+The dashboard home shows an **SEO health** list of published items missing an SEO title or description in either language. Work through it until it is empty.
+
+Each page, service, project and article has an **SEO** tab per language: title (about 50–60 characters),
 description (about 100–150 characters) and social sharing image. *Auto-generate* fills them from the content.
 Changing a published page's **slug** (URL) automatically creates a redirect from the old address.
 

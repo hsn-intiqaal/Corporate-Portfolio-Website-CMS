@@ -85,6 +85,7 @@ export const Leads: CollectionConfig = {
           options: [
             { label: 'Contact', value: 'contact' },
             { label: 'Quotation request', value: 'quote' },
+            { label: 'Brochure download', value: 'brochure' },
           ],
           admin: { width: '33%', readOnly: true },
         },
@@ -131,6 +132,7 @@ export const Leads: CollectionConfig = {
         },
         { name: 'message', type: 'textarea', admin: { readOnly: true } },
         { name: 'attachments', type: 'upload', relationTo: 'lead-files', hasMany: true, admin: { readOnly: true } },
+        { name: 'document', type: 'relationship', relationTo: 'documents', admin: { readOnly: true, condition: (d) => d?.type === 'brochure' } },
       ],
     },
     {
