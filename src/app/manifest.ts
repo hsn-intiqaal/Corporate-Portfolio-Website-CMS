@@ -1,0 +1,23 @@
+import type { MetadataRoute } from 'next'
+import { getSettings } from '@/lib/data'
+import { resolveColors } from '@/theme/css'
+
+export const dynamic = 'force-dynamic'
+
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const settings = await getSettings('ar').catch(() => null)
+  const colors = resolveColors(settings?.theme)
+  const icon = settings?.favicon && typeof settings.favicon === 'object' ? settings.favicon.url : null
+  return {
+    name: settings?.siteName ?? 'Website',
+    short_name: settings?.siteName ?? 'Website',
+    description: settings?.defaultDescription ?? undefined,
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#ffffff',
+    theme_color: colors.primary,
+    dir: 'rtl',
+    lang: 'ar',
+    icons: icon ? [{ src: icon, sizes: '512x512', type: 'image/png' }] : [],
+  }
+}

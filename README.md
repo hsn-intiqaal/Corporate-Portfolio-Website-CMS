@@ -1,59 +1,144 @@
 # Corporate Portfolio Website & CMS
 
-A clean, modern corporate portfolio website with a built-in content management system (CMS). Edit content directly in the browser using double-click editing, with changes saved to your browser's localStorage.
+A bilingual (Arabic RTL / English LTR) corporate website with a secure content dashboard, built to the
+_Corporate Portfolio Website & CMS_ project proposal.
+
+**Stack:** Next.js 16 · React 19 · TypeScript · Payload CMS 3 · PostgreSQL · Tailwind CSS 4
+
+| Document                                     | For                                                            |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| [docs/HOSTING.md](docs/HOSTING.md)           | Hosting plan, costs, launch steps, backups, security checklist |
+| [docs/EDITOR_GUIDE.md](docs/EDITOR_GUIDE.md) | Client editors and administrators                              |
+| This README                                  | Developers (technical handover)                                |
 
 ## Features
 
-- **Responsive Design** - Works on desktop, tablet, and mobile
-- **Built-in CMS** - Double-click any text element to edit it
-- **localStorage Persistence** - Your content changes are saved locally
-- **Clean Layout** - Professional sections: Hero, About, Services, Portfolio, Contact
-- **Contact Form** - Functional contact form with validation
-- **No Backend Required** - Runs entirely in the browser
+**Public website** (`/ar/...` and `/en/...`)
 
-## Getting Started
+- Home, About, Services overview and detail pages, Projects overview (category filter) and detail pages, Contact,
+  Request a quotation, legal pages, custom pages, branded 404
+- Full RTL layout for Arabic with mirrored navigation and direction-aware icons, IBM Plex Sans Arabic + Inter,
+  Western or Eastern Arabic numerals (setting), and a language switcher that keeps the visitor on the same page
+- Pages are pre-rendered and cached, then refreshed on publish. Responsive WebP/AVIF images, lazy loading
+- SEO: per-language title, description and social image; canonical; hreflang (`ar`, `en`, `x-default`); XML sitemap
+  with alternates; robots.txt (blocks staging); Open Graph / X cards; structured data (Organization or LocalBusiness,
+  Service, CreativeWork, BreadcrumbList, FAQPage); editable redirects
+- Contact and quotation forms: server-side validation, honeypot, minimum fill time, DB-backed rate limit
+  (5 per 10 min per hashed IP), Cloudflare Turnstile, private attachments (JPG/PNG/PDF, signature-checked,
+  renamed), email notification that includes the visitor's language, and an unusual-volume alert
+- **Blog / articles**: categories, authors, tags, reading time, table of contents with heading anchors, share buttons,
+  author box, related articles and services, crawlable pagination (`/blog/page/2`), category pages, RSS per language
+  (`/ar/feed.xml`, `/en/feed.xml`), BlogPosting + BreadcrumbList structured data, Open Graph article tags
+- **Site search** (`/search`) over services, projects, articles and pages in the visitor's language (noindex),
+  plus WebSite/SearchAction structured data
+- **Newsletter** with double opt-in (confirmation email, unsubscribe link), footer signup and a section block, CSV export
+- **Brochure / company-profile download** gated by a short form (creates a lead) with signed, expiring links;
+  files are never publicly listable
+- **CRM / automation webhook**: new leads and confirmed subscribers are POSTed as signed JSON (HubSpot, Zoho, Zapier, Make, n8n)
+- **Third-party scripts** (live chat, tag manager, pixels) managed from the dashboard; consent-gated ones wait for cookie consent
+- WhatsApp button, optional Google Analytics that loads only after cookie consent, web app manifest, image sitemap entries
 
-1. Clone the repository:
+**Dashboard** (`/admin`)
+
+- Home panel: enquiries chart (last 6 months), **SEO health** list (published items missing an SEO title or description, per language), drafts, latest leads, shortcuts
+- Articles, article categories and authors; downloadable documents; newsletter subscribers; rich text with tables
+- Pages built from 18 section types (hero, text & image, service cards, project gallery, project highlight, statistics,
+  testimonials, partners, FAQ, call to action, contact, rich text, latest articles, team, process steps, video,
+  newsletter, brochure download): add, reorder, duplicate, hide, remove, with per-section background and spacing
+- Services (drag to order), Projects (gallery, categories, facts), Media library (required alt text, focal point, auto sizes)
+- Header and footer menus, which only link to published pages
+- Branding and settings: logo, contacts, social, map, SEO defaults, translation rule, lead recipients
+- **Design from the dashboard** (Settings → Design): ready-made palettes or fully custom colours (primary, dark shade,
+  accent, text, secondary text, dark sections/footer, light sections, page background) with a colour picker and
+  WCAG contrast checks that reject unreadable combinations; 8 Arabic and 8 English Google fonts (self-hosted) for body
+  and headings; text size; heading weight; corner radius; button shape; header colour, sticky header, search,
+  language switcher and WhatsApp toggles; custom CSS for advanced tweaks
+- **Site texts**: every fixed website text (buttons, labels, form messages, blog and newsletter wording) editable in
+  Arabic and English; empty fields fall back to the built-in wording
+- **Bilingual dashboard**: every label, description, option and message is available in Arabic and English and
+  follows each user's interface language (Arabic by default); a unit test fails if any string lacks a translation
+- Leads inbox: status, owner, internal notes, CSV export (formula-injection safe, UTF-8 BOM for Arabic in Excel)
+- Drafts, autosave, preview on the real site, version history with restore, scheduled publishing
+- Roles: Administrator / Editor. Editors cannot see leads, users or settings, cannot delete, and publish only if allowed
+- Audit log of logins, publishing, deletions, user and settings changes
+- Slug changes on published content create 301 redirects automatically
+- Security: 8-hour sessions, 15-minute lockout after 5 failed logins, security headers
+
+## Local development
+
+Requirements: Node.js 22.12+, pnpm 10, PostgreSQL 15+.
+
 ```bash
-git clone https://github.com/hsn-intiqaal/Corporate-Portfolio-Website-CMS.git
+pnpm install
+cp .env.example .env            # set DATABASE_URL and PAYLOAD_SECRET
+pnpm seed                       # demo content + admin@example.com / ChangeMe!2026 and editor@example.com
+pnpm dev                        # http://localhost:3000 (site) and http://localhost:3000/admin
 ```
 
-2. Open `index.html` in any web browser:
+`pnpm seed --force` wipes content and reseeds (refused when `NODE_ENV=production`).
+Demo content, names, figures and images are generated placeholders. Replace them with the client's approved content.
+
+In development the database schema is pushed automatically. Production uses migrations:
+
 ```bash
-# Option A: Open directly
-start index.html
-
-# Option B: Use a simple HTTP server (recommended)
-python -m http.server 8000
-# Then visit http://localhost:8000
+pnpm migrate:create <name>      # after changing collections/fields; commit src/migrations/*
+pnpm migrate                    # apply (runs automatically on Vercel builds and Docker start)
+pnpm generate:types             # refresh src/payload-types.ts
+pnpm generate:importmap         # after adding admin components
 ```
 
-## Using the CMS
+## Scripts
 
-- **Double-click** any text element to edit it
-- Changes are automatically saved to your browser
-- Press `Enter` to save, `Esc` to cancel
+| Script                         | Does                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| `pnpm dev` / `build` / `start` | Next.js                                                                  |
+| `pnpm typecheck`               | TypeScript                                                               |
+| `pnpm lint` / `pnpm format`    | ESLint (Next.js rules) / Prettier                                        |
+| `pnpm test`                    | Unit tests (Vitest)                                                      |
+| `pnpm seed`                    | Demo content                                                             |
+| `pnpm test:smoke [url]`        | Post-deploy checks (pages, SEO files, private data not exposed, headers) |
+| `pnpm vercel-build`            | `payload migrate && next build`                                          |
 
-## Project Structure
+## Project structure
 
 ```
-.
-├── index.html      # Main HTML structure
-├── styles.css      # Styling and layout
-├── script.js       # CMS functionality and interactivity
-└── README.md       # This file
+src/
+  app/(frontend)/[locale]/   public routes (home, [slug], services, projects, 404)
+  app/(frontend)/next/       draft preview on / off
+  app/(payload)/             Payload admin + REST API (generated structure)
+  app/sitemap.ts, robots.ts  SEO files
+  proxy.ts                   adds the language prefix (cookie, then Accept-Language, then Arabic)
+  blocks/                    section definitions (CMS side)
+  components/sections/       section designs (website side)
+  components/site/           header, footer, media, links, rich text, notices
+  components/forms/          contact / quotation form
+  collections/, globals/     content model and access rules
+  hooks/                     revalidation, audit log, publish guard, slug redirects, lead email
+  lib/                       data loading, SEO, lead handling and validation, texts, formatting
+  theme/                     design options, colour/contrast helpers, theme CSS, self-hosted fonts
+  admin-i18n/                Arabic wording for the dashboard + the plugin that applies it
+  migrations/                database migrations
+  seed/                      demo content (helpers, content/, images, PDF)
+tests/unit/                  unit tests
+deploy/                      Docker Compose stack (app, Postgres, Caddy HTTPS, backups)
 ```
 
-## Customization
+## Environment variables
 
-### Adding New Sections
+See [.env.example](.env.example). Required: `DATABASE_URL`, `PAYLOAD_SECRET`, `NEXT_PUBLIC_SERVER_URL`.
+S3 storage is required on serverless hosting. SMTP and Turnstile are strongly recommended for production.
 
-Add new sections in `index.html` within the `<main>` element, then style them in `styles.css`. Make sure to add an `id` to elements you want to edit with the CMS.
+## Dashboard translations
 
-### Modifying Content
+Labels written in English in the config are translated by `src/admin-i18n/localize.ts` using `src/admin-i18n/ar.ts`.
+After adding fields run `pnpm test`; the failing test lists any new string to add to `ar.ts`.
 
-All editable content uses `id` attributes. The CMS in `script.js` maps these IDs to content values stored in localStorage.
+## Adding a section type (change request)
+
+1. Add the block config in `src/blocks/index.ts` and include it in `sectionBlocks`.
+2. Add the component in `src/components/sections/` and a `case` in `RenderSections.tsx`.
+3. `pnpm generate:types && pnpm migrate:create add-<block>`.
 
 ## License
 
-MIT
+MIT for the custom code. Open-source dependencies keep their own licences.

@@ -1,0 +1,69 @@
+{
+  "name": "corporate-portfolio-cms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bilingual (Arabic/English) corporate portfolio website with Payload CMS dashboard",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "migrate": "payload migrate",
+    "migrate:create": "payload migrate:create",
+    "seed": "payload run src/seed/index.ts",
+    "vercel-build": "payload migrate && next build",
+    "test:smoke": "node scripts/smoke.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1159.0",
+    "@payloadcms/db-postgres": "3.90.2",
+    "@payloadcms/email-nodemailer": "3.90.2",
+    "@payloadcms/next": "3.90.2",
+    "@payloadcms/plugin-redirects": "3.90.2",
+    "@payloadcms/plugin-seo": "3.90.2",
+    "@payloadcms/richtext-lexical": "3.90.2",
+    "@payloadcms/storage-s3": "3.90.2",
+    "@payloadcms/translations": "3.90.2",
+    "@payloadcms/ui": "3.90.2",
+    "cross-env": "7.0.3",
+    "graphql": "16.11.0",
+    "next": "16.3.8",
+    "payload": "3.90.2",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "server-only": "0.0.1",
+    "sharp": "0.34.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.17",
+    "@types/node": "22.19.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.8",
+    "postcss": "8.5.6",
+    "prettier": "3.9.9",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild"
+    ]
+  }
+}
