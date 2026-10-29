@@ -9,6 +9,9 @@ import { isLocale } from '@/i18n/config'
 import { getTexts } from '@/lib/texts'
 import { getCategories, getPage, getProjects, getSettings } from '@/lib/data'
 import { buildMetadata } from '@/lib/seo'
+import { JsonLd } from '@/components/site/JsonLd'
+import { absoluteURL, docPath } from '@/lib/paths'
+import { itemListLd } from '@/seo/schema'
 
 type Props = { params: Promise<{ locale: string }> }
 
@@ -64,6 +67,7 @@ export default async function ProjectsPage({ params }: Props) {
         </div>
       </section>
       <RenderSections sections={page?.doc.layout} locale={locale} numerals={numerals} firstIsPageHeading={false} />
+      <JsonLd data={itemListLd(projects.map((p) => ({ name: p.title, url: absoluteURL(docPath('projects', p.slug, locale)) })))} />
     </>
   )
 }

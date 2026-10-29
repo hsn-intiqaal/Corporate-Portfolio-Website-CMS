@@ -6,6 +6,9 @@ import { fmt } from '@/i18n/dictionary'
 import { getTexts } from '@/lib/texts'
 import { getArticleCategories, getArticles, getPage, getSettings } from '@/lib/data'
 import type { ArticleCategory } from '@/payload-types'
+import { absoluteURL, docPath } from '@/lib/paths'
+import { itemListLd } from '@/seo/schema'
+import { JsonLd } from '../site/JsonLd'
 import { PageHeader } from '../site/PageHeader'
 import { Pagination } from '../site/Pagination'
 import { ArticleCard } from './ArticleCard'
@@ -77,6 +80,7 @@ export async function BlogListing({ locale, page, category }: { locale: Locale; 
       {!category && page === 1 && (
         <RenderSections sections={intro?.doc.layout} locale={locale} numerals={numerals} firstIsPageHeading={false} />
       )}
+      <JsonLd data={itemListLd(result.docs.map((a) => ({ name: a.title, url: absoluteURL(docPath('articles', a.slug, locale)) })))} />
     </>
   )
 }

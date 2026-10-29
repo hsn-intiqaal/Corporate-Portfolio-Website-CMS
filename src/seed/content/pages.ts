@@ -9,6 +9,8 @@ export const homePage = (m: { heroImg: number; aboutImg: number; partnerLogos: n
   slug: 'home',
   title: t('الرئيسية', 'Home'),
   meta: {
+    keyword: t('مقاولات', 'contracting'),
+    image: m.heroImg,
     title: t('شركة النموذج | حلول هندسية ومقاولات', 'Example Company | Engineering & Contracting'),
     description: t(
       'نصمم وننفذ مشاريع عالية الجودة في المملكة. اطلب عرض سعر اليوم.',
@@ -181,6 +183,14 @@ export const homePage = (m: { heroImg: number; aboutImg: number; partnerLogos: n
 export const aboutPage = (m: { heroImg: number; aboutImg: number; authorImg1: number; authorImg2: number; brochureDoc: number }) => ({
   _status: 'published',
   slug: 'about',
+  meta: {
+    title: t('من نحن | شركة النموذج للمقاولات', 'About us | Example Contracting Company'),
+    description: t(
+      'تعرّف على قصة شركة النموذج وقيمنا وفريق القيادة وخبرتنا في التصميم والتنفيذ والصيانة منذ عام 2010.',
+      'Discover the story of Example Company, our values, our leadership team and our design, construction and maintenance expertise since 2010.',
+    ),
+    image: m.aboutImg,
+  },
   title: t('من نحن', 'About us'),
   layout: [
     {

@@ -8,6 +8,9 @@ import { isLocale } from '@/i18n/config'
 import { getTexts } from '@/lib/texts'
 import { getPage, getServices, getSettings } from '@/lib/data'
 import { buildMetadata } from '@/lib/seo'
+import { JsonLd } from '@/components/site/JsonLd'
+import { absoluteURL, docPath } from '@/lib/paths'
+import { itemListLd } from '@/seo/schema'
 
 type Props = { params: Promise<{ locale: string }> }
 
@@ -57,6 +60,7 @@ export default async function ServicesPage({ params }: Props) {
         numerals={settings.arabicNumerals ?? 'western'}
         firstIsPageHeading={false}
       />
+      <JsonLd data={itemListLd(services.map((s) => ({ name: s.title, url: absoluteURL(docPath('services', s.slug, locale)) })))} />
     </>
   )
 }

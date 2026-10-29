@@ -7,6 +7,7 @@ import { auditAfterChange, auditAfterDelete } from '@/hooks/audit'
 import { publishGuard } from '@/hooks/publishGuard'
 import { revalidateAfterChange, revalidateAfterDelete } from '@/hooks/revalidate'
 import { slugRedirect } from '@/hooks/slugRedirect'
+import { pingIndexNow } from '@/lib/indexnow'
 import { previewUrlFor } from '@/lib/previewUrl'
 import { pageTemplates } from './pageTemplates'
 
@@ -39,7 +40,7 @@ export const Pages: CollectionConfig = {
         return data
       },
     ],
-    afterChange: [slugRedirect, revalidateAfterChange, auditAfterChange],
+    afterChange: [slugRedirect, revalidateAfterChange, auditAfterChange, pingIndexNow],
     afterDelete: [revalidateAfterDelete, auditAfterDelete],
   },
   fields: [

@@ -97,6 +97,15 @@ async function seed() {
     const created = await createBi(payload, 'services', {
       _status: 'published',
       slug: s.slug,
+      meta: {
+        keyword: t(s.ar, s.en),
+        title: t(`${s.ar} في الرياض | شركة النموذج`, `${s.en} in Riyadh | Example Company`),
+        description: t(
+          `${s.arEx} فريق معتمد وضمان على الأعمال. اطلب عرض سعر مجاني اليوم.`,
+          `${s.enEx} Certified team and workmanship warranty. Request a free quotation today.`,
+        ),
+        image,
+      },
       icon: s.icon,
       image,
       featured: i < 3,
@@ -138,6 +147,14 @@ async function seed() {
     const created = await createBi(payload, 'projects', {
       _status: 'published',
       slug: pr.slug,
+      meta: {
+        title: t(`${pr.ar} | مشاريع شركة النموذج`, `${pr.en} | Example Company projects`),
+        description: t(
+          `تفاصيل مشروع ${pr.ar}: التحدي والحل والنتيجة، مع صور المشروع وبياناته. تعرّف على أعمالنا المنجزة.`,
+          `${pr.en}: the challenge, the solution and the result, with project photos and key facts. See our completed work.`,
+        ),
+        image: cover,
+      },
       title: t(pr.ar, pr.en),
       excerpt: t('مشروع تجريبي يوضح طريقة عرض المشاريع في الموقع.', 'A sample project showing how portfolio items are presented.'),
       coverImage: cover,
@@ -195,6 +212,15 @@ async function seed() {
     const created = await createBi(payload, 'articles', {
       _status: 'published',
       slug: a.slug,
+      meta: {
+        keyword: t(a.ar.split(' ').slice(0, 2).join(' '), a.en.split(' ').slice(0, 2).join(' ')),
+        title: t(`${a.ar} | مدونة شركة النموذج`, `${a.en} | Example Company blog`),
+        description: t(
+          `${a.ar}: دليل عملي مختصر بخطوات واضحة ونصائح من خبراء فريقنا لمساعدتك على اتخاذ القرار الصحيح لمشروعك.`,
+          `${a.en}: a short practical guide with clear steps and expert tips from our team to help you make the right decision.`,
+        ),
+        image: cover,
+      },
       title: t(a.ar, a.en),
       excerpt: t(
         `مقال تجريبي بعنوان «${a.ar}» يوضح طريقة عرض المقالات. يُستبدل بالمحتوى المعتمد.`,
@@ -268,6 +294,14 @@ async function seed() {
   const contact = await createBi(payload, 'pages', {
     _status: 'published',
     slug: 'contact',
+    meta: {
+      title: t('تواصل معنا | شركة النموذج', 'Contact us | Example Company'),
+      description: t(
+        'تواصل مع فريق شركة النموذج عبر الهاتف أو الواتساب أو البريد الإلكتروني، أو أرسل رسالتك وسنرد خلال يوم عمل.',
+        'Contact the Example Company team by phone, WhatsApp or email, or send us a message and we will reply within one working day.',
+      ),
+      image: heroImg,
+    },
     title: t('تواصل معنا', 'Contact us'),
     layout: [
       {
@@ -285,6 +319,14 @@ async function seed() {
   const quote = await createBi(payload, 'pages', {
     _status: 'published',
     slug: 'request-a-quote',
+    meta: {
+      title: t('اطلب عرض سعر مجاني | شركة النموذج', 'Request a free quotation | Example Company'),
+      description: t(
+        'أرسل تفاصيل مشروعك واحصل على عرض سعر مفصل ومجاني خلال ثلاثة أيام عمل من فريق شركة النموذج المتخصص.',
+        'Send your project details and receive a detailed, free quotation within three working days from our specialist team.',
+      ),
+      image: heroImg,
+    },
     title: t('اطلب عرض سعر', 'Request a quotation'),
     layout: [
       {
@@ -307,12 +349,28 @@ async function seed() {
   const privacy = await createBi(payload, 'pages', {
     _status: 'published',
     slug: 'privacy-policy',
+    meta: {
+      title: t('سياسة الخصوصية | شركة النموذج', 'Privacy policy | Example Company'),
+      description: t(
+        'تعرّف على كيفية جمع بياناتك الشخصية واستخدامها وحمايتها عند استخدام موقع شركة النموذج ونماذج التواصل.',
+        'How Example Company collects, uses and protects your personal data when you use this website and its contact forms.',
+      ),
+      image: heroImg,
+    },
     title: t('سياسة الخصوصية', 'Privacy policy'),
     layout: [{ blockType: 'richText', width: 'narrow', content: legal('سياسة الخصوصية', 'privacy policy'), settings: settings() }],
   })
   const terms = await createBi(payload, 'pages', {
     _status: 'published',
     slug: 'terms',
+    meta: {
+      title: t('الشروط والأحكام | شركة النموذج', 'Terms and conditions | Example Company'),
+      description: t(
+        'الشروط والأحكام التي تنظم استخدام موقع شركة النموذج والخدمات والمعلومات المعروضة فيه. يرجى قراءتها بعناية.',
+        'The terms and conditions that govern the use of the Example Company website, its services and the information shown on it.',
+      ),
+      image: heroImg,
+    },
     title: t('الشروط والأحكام', 'Terms and conditions'),
     layout: [{ blockType: 'richText', width: 'narrow', content: legal('الشروط والأحكام', 'terms and conditions'), settings: settings() }],
   })
@@ -384,7 +442,20 @@ async function seed() {
     titleSuffix: t(' | شركة النموذج', ' | Example Company'),
     defaultDescription: t('حلول هندسية ومقاولات بجودة عالية.', 'High-quality engineering and contracting solutions.'),
     defaultImage: heroImg,
-    organizationType: 'Organization',
+    organizationType: 'HomeAndConstructionBusiness',
+    siteAlternateName: t('النموذج', 'Example Co'),
+    legalName: t('شركة النموذج للمقاولات', 'Example Contracting Company'),
+    foundingYear: 2010,
+    streetAddress: t('طريق الملك فهد', 'King Fahd Road'),
+    city: t('الرياض', 'Riyadh'),
+    region: t('منطقة الرياض', 'Riyadh Province'),
+    postalCode: '12211',
+    countryCode: 'SA',
+    latitude: 24.7136,
+    longitude: 46.6753,
+    areaServed: t('الرياض، جدة، الدمام', 'Riyadh, Jeddah, Dammam'),
+    openingHours: [{ days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], opens: '08:00', closes: '17:00' }],
+    indexNow: true,
     missingTranslation: 'fallback',
     arabicNumerals: 'western',
     leadRecipients: [{ email: adminEmail }],
