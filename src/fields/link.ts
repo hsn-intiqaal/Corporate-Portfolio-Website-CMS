@@ -1,13 +1,20 @@
 import type { Condition, Field, GroupField, Validate } from 'payload'
+import { vmsg } from '@/fields/messages'
 
 export const linkableCollections = ['pages', 'services', 'projects', 'articles'] as const
 
-const requireTarget: Validate = (_value, { siblingData }) => {
+const requireTarget: Validate = (_value, options) => {
+  const { siblingData } = options
   const s = siblingData as { type?: string; reference?: unknown; url?: string }
-  if (s.type === 'internal' && !s.reference) return 'Choose a page to link to'
+  if (s.type === 'internal' && !s.reference) return vmsg(options, 'Choose a page to link to', 'اختر الصفحة المراد الربط بها')
   if (s.type === 'custom') {
-    if (!s.url) return 'Enter a URL'
-    if (!/^(https?:\/\/|mailto:|tel:|\/|#)/.test(s.url)) return 'URL must start with https://, /, #, mailto: or tel:'
+    if (!s.url) return vmsg(options, 'Enter a URL', 'أدخل الرابط')
+    if (!/^(https?:\/\/|mailto:|tel:|\/|#)/.test(s.url))
+      return vmsg(
+        options,
+        'URL must start with https://, /, #, mailto: or tel:',
+        'يجب أن يبدأ الرابط بـ https:// أو / أو # أو mailto: أو tel:',
+      )
   }
   return true
 }

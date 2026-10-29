@@ -6,10 +6,25 @@ import { Icon } from './Icon'
 
 export type NavItem = { href: string; label: string; newTab?: boolean; children?: { href: string; label: string; newTab?: boolean }[] }
 
-export function MobileNav({ items, menuLabel, closeLabel, cta }: { items: NavItem[]; menuLabel: string; closeLabel: string; cta?: { href: string; label: string } | null }) {
+export function MobileNav({
+  items,
+  menuLabel,
+  closeLabel,
+  cta,
+}: {
+  items: NavItem[]
+  menuLabel: string
+  closeLabel: string
+  cta?: { href: string; label: string } | null
+}) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
-  useEffect(() => setOpen(false), [pathname])
+  // Close the menu after navigating (state adjusted during render, as React recommends).
+  const [lastPath, setLastPath] = useState(pathname)
+  if (pathname !== lastPath) {
+    setLastPath(pathname)
+    setOpen(false)
+  }
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
@@ -19,7 +34,13 @@ export function MobileNav({ items, menuLabel, closeLabel, cta }: { items: NavIte
 
   return (
     <div className="lg:hidden">
-      <button type="button" className="rounded-md p-2 hover:bg-black/5" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>
+      <button
+        type="button"
+        className="rounded-md p-2 hover:bg-black/5"
+        aria-expanded={open}
+        aria-controls="mobile-menu"
+        onClick={() => setOpen(!open)}
+      >
         <span className="sr-only">{open ? closeLabel : menuLabel}</span>
         <Icon name={open ? 'close' : 'menu'} className="size-6" />
       </button>
@@ -28,14 +49,22 @@ export function MobileNav({ items, menuLabel, closeLabel, cta }: { items: NavIte
           <ul className="space-y-1">
             {items.map((item) => (
               <li key={item.href + item.label}>
-                <Link href={item.href} className="block rounded-lg px-3 py-3 text-lg font-medium hover:bg-soft" target={item.newTab ? '_blank' : undefined}>
+                <Link
+                  href={item.href}
+                  className="block rounded-lg px-3 py-3 text-lg font-medium hover:bg-soft"
+                  target={item.newTab ? '_blank' : undefined}
+                >
                   {item.label}
                 </Link>
                 {item.children && item.children.length > 0 && (
                   <ul className="ms-4 border-s border-line ps-2">
                     {item.children.map((c) => (
                       <li key={c.href + c.label}>
-                        <Link href={c.href} className="block rounded-lg px-3 py-2 text-muted hover:bg-soft" target={c.newTab ? '_blank' : undefined}>
+                        <Link
+                          href={c.href}
+                          className="block rounded-lg px-3 py-2 text-muted hover:bg-soft"
+                          target={c.newTab ? '_blank' : undefined}
+                        >
                           {c.label}
                         </Link>
                       </li>

@@ -7,7 +7,10 @@ export async function sendWebhook(payload: Payload, event: string, data: Record<
     const settings = await payload.findGlobal({ slug: 'settings', depth: 0, overrideAccess: true })
     if (!settings.webhookUrl) return
     const body = JSON.stringify({ event, sentAt: new Date().toISOString(), data })
-    const signature = crypto.createHmac('sha256', settings.webhookSecret || '').update(body).digest('hex')
+    const signature = crypto
+      .createHmac('sha256', settings.webhookSecret || '')
+      .update(body)
+      .digest('hex')
     const res = await fetch(settings.webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Signature': signature, 'X-Event': event },

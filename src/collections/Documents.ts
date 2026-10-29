@@ -27,7 +27,12 @@ export const Documents: CollectionConfig = {
   access: { read: readWithToken, create: staffOnly, update: staffOnly, delete: adminOnly },
   upload: {
     staticDir: path.resolve(dirname, '../../documents'),
-    mimeTypes: ['application/pdf', 'application/zip', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    mimeTypes: [
+      'application/pdf',
+      'application/zip',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ],
   },
   fields: [
     { name: 'title', type: 'text', localized: true, required: true },

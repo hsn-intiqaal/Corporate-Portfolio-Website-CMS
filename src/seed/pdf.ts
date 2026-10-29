@@ -1,6 +1,8 @@
 /** Builds a small, valid one-page PDF (used as the placeholder company-profile brochure). */
 export function simplePdf(lines: string[]): Buffer {
-  const text = lines.map((l, i) => `BT /F1 ${i === 0 ? 24 : 13} Tf 72 ${740 - i * 28} Td (${l.replace(/[()\\]/g, '\\$&')}) Tj ET`).join('\n')
+  const text = lines
+    .map((l, i) => `BT /F1 ${i === 0 ? 24 : 13} Tf 72 ${740 - i * 28} Td (${l.replace(/[()\\]/g, '\\$&')}) Tj ET`)
+    .join('\n')
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',
     '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',

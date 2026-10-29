@@ -5,7 +5,7 @@ import { TranslationNotice } from '@/components/site/Notices'
 import { PageHeader } from '@/components/site/PageHeader'
 import { RenderSections } from '@/components/sections/RenderSections'
 import { isLocale, locales } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { followRedirect, getAllSlugs, getPage, getSettings } from '@/lib/data'
 import { buildMetadata } from '@/lib/seo'
 
@@ -38,7 +38,7 @@ export default async function Page({ params }: Props) {
     notFound()
   }
   const settings = await getSettings(locale)
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   const sections = res.doc.layout ?? []
   const startsWithHero = sections.find((s) => !s.settings?.hidden)?.blockType === 'hero'
   return (

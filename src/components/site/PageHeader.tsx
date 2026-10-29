@@ -7,7 +7,17 @@ import { JsonLd } from './JsonLd'
 type Crumb = { name: string; path: string }
 
 /** Title band for inner pages, with visible breadcrumbs and BreadcrumbList structured data. */
-export function PageHeader({ title, intro, crumbs, children }: { title: string; intro?: string | null; crumbs: Crumb[]; children?: React.ReactNode }) {
+export function PageHeader({
+  title,
+  intro,
+  crumbs,
+  children,
+}: {
+  title: string
+  intro?: string | null
+  crumbs: Crumb[]
+  children?: React.ReactNode
+}) {
   return (
     <div className="on-dark bg-gradient-to-br from-brand-dark to-brand py-14 sm:py-20">
       <div className="container-site">

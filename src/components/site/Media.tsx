@@ -24,7 +24,8 @@ export function Media({ resource, size, className, imgClassName, fill, priority,
   const width = variant?.width || resource.width || 1200
   const height = variant?.height || resource.height || 800
   const isSvg = resource.mimeType === 'image/svg+xml'
-  const style = resource.focalX != null && resource.focalY != null ? { objectPosition: `${resource.focalX}% ${resource.focalY}%` } : undefined
+  const style =
+    resource.focalX != null && resource.focalY != null ? { objectPosition: `${resource.focalX}% ${resource.focalY}%` } : undefined
 
   const img = (
     <Image

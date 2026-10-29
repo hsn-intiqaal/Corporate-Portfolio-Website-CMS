@@ -26,7 +26,14 @@ export const slugRedirect: CollectionAfterChangeHook = async ({ collection, doc,
   const prefix = prefixFor[collection.slug] ?? ''
   for (const locale of locales) {
     const from = oldSlug === 'home' && !prefix ? `/${locale}` : `/${locale}${prefix}/${oldSlug}`
-    const existing = await req.payload.find({ collection: 'redirects', where: { from: { equals: from } }, limit: 1, depth: 0, req, overrideAccess: true })
+    const existing = await req.payload.find({
+      collection: 'redirects',
+      where: { from: { equals: from } },
+      limit: 1,
+      depth: 0,
+      req,
+      overrideAccess: true,
+    })
     if (existing.totalDocs > 0) continue
     await req.payload.create({
       collection: 'redirects',

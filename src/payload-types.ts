@@ -119,11 +119,21 @@ export interface Config {
     header: Header;
     footer: Footer;
     settings: Setting;
+    'site-texts-general': SiteTextsGeneral;
+    'site-texts-content': SiteTextsContent;
+    'site-texts-blog': SiteTextsBlog;
+    'site-texts-forms': SiteTextsForm;
+    'site-texts-newsletter': SiteTextsNewsletter;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     settings: SettingsSelect<false> | SettingsSelect<true>;
+    'site-texts-general': SiteTextsGeneralSelect<false> | SiteTextsGeneralSelect<true>;
+    'site-texts-content': SiteTextsContentSelect<false> | SiteTextsContentSelect<true>;
+    'site-texts-blog': SiteTextsBlogSelect<false> | SiteTextsBlogSelect<true>;
+    'site-texts-forms': SiteTextsFormsSelect<false> | SiteTextsFormsSelect<true>;
+    'site-texts-newsletter': SiteTextsNewsletterSelect<false> | SiteTextsNewsletterSelect<true>;
   };
   locale: 'ar' | 'en';
   widgets: {
@@ -2800,10 +2810,68 @@ export interface Setting {
    * Square PNG, 512×512
    */
   favicon?: (number | null) | Media;
-  /**
-   * Choose from the approved palettes. New palettes are added by the developer.
-   */
-  palette: 'ocean' | 'teal' | 'navy' | 'emerald' | 'graphite' | 'burgundy';
+  theme?: {
+    colorMode?: ('preset' | 'custom') | null;
+    preset?: ('ocean' | 'teal' | 'navy' | 'emerald' | 'graphite' | 'burgundy') | null;
+    /**
+     * Buttons, links, header accents. White text must be readable on it.
+     */
+    primary?: string | null;
+    /**
+     * Hover state and page title band. Empty = generated from the primary colour.
+     */
+    primaryDark?: string | null;
+    /**
+     * Icons and highlights.
+     */
+    accent?: string | null;
+    /**
+     * Headings and body text. Must be readable on the page background.
+     */
+    ink?: string | null;
+    /**
+     * Descriptions and captions.
+     */
+    muted?: string | null;
+    /**
+     * Background of dark sections and the footer.
+     */
+    dark?: string | null;
+    /**
+     * Background of "light grey" sections.
+     */
+    soft?: string | null;
+    /**
+     * Usually white.
+     */
+    background?: string | null;
+    arabicFont?:
+      ('ibm-plex-arabic' | 'cairo' | 'tajawal' | 'almarai' | 'noto-kufi' | 'readex' | 'noto-naskh' | 'changa') | null;
+    /**
+     * Empty = same as body font
+     */
+    arabicHeadingFont?:
+      ('ibm-plex-arabic' | 'cairo' | 'tajawal' | 'almarai' | 'noto-kufi' | 'readex' | 'noto-naskh' | 'changa') | null;
+    latinFont?: ('inter' | 'poppins' | 'montserrat' | 'roboto' | 'open-sans' | 'lato' | 'manrope' | 'playfair') | null;
+    /**
+     * Empty = same as body font
+     */
+    latinHeadingFont?:
+      ('inter' | 'poppins' | 'montserrat' | 'roboto' | 'open-sans' | 'lato' | 'manrope' | 'playfair') | null;
+    baseFontSize?: ('small' | 'normal' | 'large' | 'xlarge') | null;
+    headingWeight?: ('600' | '700' | '800') | null;
+    radius?: ('none' | 'small' | 'medium' | 'large') | null;
+    buttonShape?: ('rounded' | 'pill' | 'square') | null;
+    headerStyle?: ('light' | 'brand' | 'dark') | null;
+    stickyHeader?: boolean | null;
+    showSearch?: boolean | null;
+    showLanguageSwitcher?: boolean | null;
+    showWhatsAppButton?: boolean | null;
+    /**
+     * For small adjustments by someone who knows CSS. Applied to every page after the theme. Wrong CSS can break the layout: test on staging first.
+     */
+    customCss?: string | null;
+  };
   phone?: string | null;
   /**
    * International format, digits only, e.g. 9665XXXXXXXX
@@ -2875,6 +2943,485 @@ export interface Setting {
    */
   spamAlertThreshold?: number | null;
   editorsCanPublish?: boolean | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Fixed texts on the website. Switch the locale at the top to edit Arabic or English. Empty fields use the default shown as the label.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-general".
+ */
+export interface SiteTextsGeneral {
+  id: number;
+  /**
+   * Leave empty to use the default.
+   */
+  skipToContent?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  menu?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  close?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  home?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  services?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  projects?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  requestQuote?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  contactUs?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  viewAll?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  readMore?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  previous?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  next?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  followUs?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  rights?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  phone?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  email?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  address?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  whatsapp?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  notFoundTitle?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  notFoundText?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  backHome?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  missingTranslation?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  draftBanner?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  exitPreview?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  cookieText?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  accept?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  decline?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Fixed texts on the website. Switch the locale at the top to edit Arabic or English. Empty fields use the default shown as the label.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-content".
+ */
+export interface SiteTextsContent {
+  id: number;
+  /**
+   * Leave empty to use the default.
+   */
+  viewService?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  viewProject?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  allProjects?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  location?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  date?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  client?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  category?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  gallery?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  relatedServices?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  noProjects?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  watchVideo?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  download?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  downloadReady?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  downloadNow?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Fixed texts on the website. Switch the locale at the top to edit Arabic or English. Empty fields use the default shown as the label.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-blog".
+ */
+export interface SiteTextsBlog {
+  id: number;
+  /**
+   * Leave empty to use the default.
+   */
+  blog?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  articles?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  latestArticles?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  readArticle?: string | null;
+  /**
+   * Leave empty to use the default. Keep the {placeholders}.
+   */
+  minRead?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  publishedOn?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  updatedOn?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  by?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  tableOfContents?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  share?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  copyLink?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  linkCopied?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  relatedArticles?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  allCategories?: string | null;
+  /**
+   * Leave empty to use the default. Keep the {placeholders}.
+   */
+  pageOf?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  noArticles?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  tags?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  rss?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  search?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  searchPlaceholder?: string | null;
+  /**
+   * Leave empty to use the default. Keep the {placeholders}.
+   */
+  searchResults?: string | null;
+  /**
+   * Leave empty to use the default.
+   */
+  noResults?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Fixed texts on the website. Switch the locale at the top to edit Arabic or English. Empty fields use the default shown as the label.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-forms".
+ */
+export interface SiteTextsForm {
+  id: number;
+  form?: {
+    /**
+     * Leave empty to use the default.
+     */
+    name?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    email?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    phone?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    company?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    subject?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    message?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    service?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    selectService?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    projectLocation?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    timeline?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    budget?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    details?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    attachments?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    attachmentsHint?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    consent?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    submit?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    submitQuote?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    sending?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    success?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    error?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    rateLimited?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    challengeFailed?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    required?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    invalidEmail?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    invalidPhone?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    tooLong?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    fileType?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    fileSize?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    fileCount?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Fixed texts on the website. Switch the locale at the top to edit Arabic or English. Empty fields use the default shown as the label.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-newsletter".
+ */
+export interface SiteTextsNewsletter {
+  id: number;
+  newsletter?: {
+    /**
+     * Leave empty to use the default.
+     */
+    title?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    text?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    placeholder?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    submit?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    checkEmail?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    invalid?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    emailSubject?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    emailBody?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    emailButton?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    confirmed?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    unsubscribed?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    invalidLink?: string | null;
+    /**
+     * Leave empty to use the default.
+     */
+    unsubscribe?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2979,7 +3526,34 @@ export interface SettingsSelect<T extends boolean = true> {
   logo?: T;
   logoLight?: T;
   favicon?: T;
-  palette?: T;
+  theme?:
+    | T
+    | {
+        colorMode?: T;
+        preset?: T;
+        primary?: T;
+        primaryDark?: T;
+        accent?: T;
+        ink?: T;
+        muted?: T;
+        dark?: T;
+        soft?: T;
+        background?: T;
+        arabicFont?: T;
+        arabicHeadingFont?: T;
+        latinFont?: T;
+        latinHeadingFont?: T;
+        baseFontSize?: T;
+        headingWeight?: T;
+        radius?: T;
+        buttonShape?: T;
+        headerStyle?: T;
+        stickyHeader?: T;
+        showSearch?: T;
+        showLanguageSwitcher?: T;
+        showWhatsAppButton?: T;
+        customCss?: T;
+      };
   phone?: T;
   whatsapp?: T;
   email?: T;
@@ -3021,6 +3595,164 @@ export interface SettingsSelect<T extends boolean = true> {
       };
   spamAlertThreshold?: T;
   editorsCanPublish?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-general_select".
+ */
+export interface SiteTextsGeneralSelect<T extends boolean = true> {
+  skipToContent?: T;
+  menu?: T;
+  close?: T;
+  home?: T;
+  services?: T;
+  projects?: T;
+  requestQuote?: T;
+  contactUs?: T;
+  viewAll?: T;
+  readMore?: T;
+  previous?: T;
+  next?: T;
+  followUs?: T;
+  rights?: T;
+  phone?: T;
+  email?: T;
+  address?: T;
+  whatsapp?: T;
+  notFoundTitle?: T;
+  notFoundText?: T;
+  backHome?: T;
+  missingTranslation?: T;
+  draftBanner?: T;
+  exitPreview?: T;
+  cookieText?: T;
+  accept?: T;
+  decline?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-content_select".
+ */
+export interface SiteTextsContentSelect<T extends boolean = true> {
+  viewService?: T;
+  viewProject?: T;
+  allProjects?: T;
+  location?: T;
+  date?: T;
+  client?: T;
+  category?: T;
+  gallery?: T;
+  relatedServices?: T;
+  noProjects?: T;
+  watchVideo?: T;
+  download?: T;
+  downloadReady?: T;
+  downloadNow?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-blog_select".
+ */
+export interface SiteTextsBlogSelect<T extends boolean = true> {
+  blog?: T;
+  articles?: T;
+  latestArticles?: T;
+  readArticle?: T;
+  minRead?: T;
+  publishedOn?: T;
+  updatedOn?: T;
+  by?: T;
+  tableOfContents?: T;
+  share?: T;
+  copyLink?: T;
+  linkCopied?: T;
+  relatedArticles?: T;
+  allCategories?: T;
+  pageOf?: T;
+  noArticles?: T;
+  tags?: T;
+  rss?: T;
+  search?: T;
+  searchPlaceholder?: T;
+  searchResults?: T;
+  noResults?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-forms_select".
+ */
+export interface SiteTextsFormsSelect<T extends boolean = true> {
+  form?:
+    | T
+    | {
+        name?: T;
+        email?: T;
+        phone?: T;
+        company?: T;
+        subject?: T;
+        message?: T;
+        service?: T;
+        selectService?: T;
+        projectLocation?: T;
+        timeline?: T;
+        budget?: T;
+        details?: T;
+        attachments?: T;
+        attachmentsHint?: T;
+        consent?: T;
+        submit?: T;
+        submitQuote?: T;
+        sending?: T;
+        success?: T;
+        error?: T;
+        rateLimited?: T;
+        challengeFailed?: T;
+        required?: T;
+        invalidEmail?: T;
+        invalidPhone?: T;
+        tooLong?: T;
+        fileType?: T;
+        fileSize?: T;
+        fileCount?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-texts-newsletter_select".
+ */
+export interface SiteTextsNewsletterSelect<T extends boolean = true> {
+  newsletter?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        placeholder?: T;
+        submit?: T;
+        checkEmail?: T;
+        invalid?: T;
+        emailSubject?: T;
+        emailBody?: T;
+        emailButton?: T;
+        confirmed?: T;
+        unsubscribed?: T;
+        invalidLink?: T;
+        unsubscribe?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

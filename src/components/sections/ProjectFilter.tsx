@@ -1,5 +1,6 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { notifyClientValues, useClientValue } from '@/lib/useClientValue'
 
 type Props = {
   categories: { id: number; slug: string; title: string }[]
@@ -11,18 +12,15 @@ type Props = {
 
 /** Category filter for the projects overview. All projects are server-rendered; filtering is instant on the client. */
 export function ProjectFilter({ categories, itemCategories, allLabel, emptyLabel, children }: Props) {
-  const [active, setActive] = useState<string>('')
-  useEffect(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get('category') ?? ''
-    if (categories.some((c) => c.slug === fromUrl)) setActive(fromUrl)
-  }, [categories])
+  const fromUrl = useClientValue(() => new URLSearchParams(window.location.search).get('category') ?? '', '')
+  const active = categories.some((c) => c.slug === fromUrl) ? fromUrl : ''
 
   const select = (slug: string) => {
-    setActive(slug)
     const url = new URL(window.location.href)
     if (slug) url.searchParams.set('category', slug)
     else url.searchParams.delete('category')
     window.history.replaceState(null, '', url)
+    notifyClientValues()
   }
 
   const activeId = categories.find((c) => c.slug === active)?.id
@@ -46,7 +44,11 @@ export function ProjectFilter({ categories, itemCategories, allLabel, emptyLabel
           ))}
         </div>
       )}
-      {visible.length > 0 ? <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{visible}</div> : <p className="py-10 text-center text-muted">{emptyLabel}</p>}
+      {visible.length > 0 ? (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{visible}</div>
+      ) : (
+        <p className="py-10 text-center text-muted">{emptyLabel}</p>
+      )}
     </>
   )
 }

@@ -1,4 +1,7 @@
+import { ARABIC_CHARS } from '@/fields/slug'
 /** Helpers for Lexical rich-text JSON (plain text, reading time, headings for a table of contents). */
+const NOT_ANCHOR_CHAR = new RegExp(`[^a-z0-9${ARABIC_CHARS}\\s-]`, 'g')
+
 type LexNode = { type?: string; text?: string; tag?: string; children?: LexNode[] }
 
 export const lexicalToText = (data: unknown): string => {
@@ -9,15 +12,11 @@ export const lexicalToText = (data: unknown): string => {
 }
 
 /** Minutes at ~200 words per minute (similar for Arabic and English body text). */
-export const readingMinutes = (data: unknown): number => Math.max(1, Math.round(lexicalToText(data).split(' ').filter(Boolean).length / 200))
+export const readingMinutes = (data: unknown): number =>
+  Math.max(1, Math.round(lexicalToText(data).split(' ').filter(Boolean).length / 200))
 
 export const headingId = (text: string): string =>
-  text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9؀-ۿ\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .slice(0, 80) || 'section'
+  text.toLowerCase().trim().replace(NOT_ANCHOR_CHAR, '').replace(/\s+/g, '-').slice(0, 80) || 'section'
 
 export const extractHeadings = (data: unknown): { id: string; text: string; level: 2 | 3 }[] => {
   const root = (data as { root?: LexNode } | null)?.root

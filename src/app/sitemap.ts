@@ -15,7 +15,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getAllSlugs('articles'),
     getArticleCategories('ar'),
   ])
-  const entry = (collection: 'pages' | 'services' | 'projects' | 'articles', slug: string, lastModified?: string, priority = 0.7, image?: string) =>
+  const entry = (
+    collection: 'pages' | 'services' | 'projects' | 'articles',
+    slug: string,
+    lastModified?: string,
+    priority = 0.7,
+    image?: string,
+  ) =>
     locales.map((locale) => ({
       ...(image ? { images: [image] } : {}),
       url: absoluteURL(docPath(collection, slug, locale)),

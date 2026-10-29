@@ -23,7 +23,12 @@ export function TextImage({ block, locale }: { block: TextImageBlock; locale: Lo
         </div>
         {hasImage && (
           <div className={block.imageSide === 'start' ? 'lg:order-1' : ''}>
-            <Media resource={block.image} size="large" imgClassName="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg" sizes="(max-width: 1024px) 100vw, 50vw" />
+            <Media
+              resource={block.image}
+              size="large"
+              imgClassName="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
           </div>
         )}
       </div>

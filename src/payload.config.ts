@@ -12,6 +12,8 @@ import { en } from '@payloadcms/translations/languages/en'
 import sharp from 'sharp'
 
 import { adminOnly } from './access'
+import { ar as adminAr } from './admin-i18n/ar'
+import { localizeAdmin } from './admin-i18n/localize'
 import { ArticleCategories } from './collections/ArticleCategories'
 import { Articles } from './collections/Articles'
 import { AuditLogs } from './collections/AuditLogs'
@@ -29,6 +31,7 @@ import { Users } from './collections/Users'
 import { Footer } from './globals/Footer'
 import { Header } from './globals/Header'
 import { Settings } from './globals/Settings'
+import { SiteTexts } from './globals/SiteTexts'
 import { revalidateAfterChange, revalidateAfterDelete } from './hooks/revalidate'
 import { docPath, serverURL } from './lib/paths'
 import { isLocale } from './i18n/config'
@@ -52,7 +55,7 @@ export default buildConfig({
     dateFormat: 'd MMM yyyy, HH:mm',
   },
   // The dashboard itself can be used in Arabic or English (each user picks in their account).
-  i18n: { supportedLanguages: { ar, en }, fallbackLanguage: 'en' },
+  i18n: { supportedLanguages: { ar, en }, fallbackLanguage: 'ar' },
   localization: {
     locales: [
       { label: 'العربية', code: 'ar', rtl: true },
@@ -61,8 +64,23 @@ export default buildConfig({
     defaultLocale: 'ar',
     fallback: true,
   },
-  collections: [Pages, Services, Projects, ProjectCategories, Articles, ArticleCategories, Authors, Media, Documents, Leads, LeadFiles, Subscribers, Users, AuditLogs],
-  globals: [Header, Footer, Settings],
+  collections: [
+    Pages,
+    Services,
+    Projects,
+    ProjectCategories,
+    Articles,
+    ArticleCategories,
+    Authors,
+    Media,
+    Documents,
+    Leads,
+    LeadFiles,
+    Subscribers,
+    Users,
+    AuditLogs,
+  ],
+  globals: [Header, Footer, Settings, ...SiteTexts],
   // Rich text: headings, lists, links, quotes, images, internal links and tables.
   editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, EXPERIMENTAL_TableFeature()] }),
   db: postgresAdapter({
@@ -150,6 +168,8 @@ export default buildConfig({
         },
       },
     }),
+    // Must stay last: translates the labels added by the plugins above as well.
+    localizeAdmin(adminAr),
   ],
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   graphQL: { disable: true },

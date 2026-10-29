@@ -27,7 +27,11 @@ export function FAQ({ block }: { block: FAQBlock }) {
           data={{
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
-            mainEntity: items.map((i) => ({ '@type': 'Question', name: i.question, acceptedAnswer: { '@type': 'Answer', text: i.answer } })),
+            mainEntity: items.map((i) => ({
+              '@type': 'Question',
+              name: i.question,
+              acceptedAnswer: { '@type': 'Answer', text: i.answer },
+            })),
           }}
         />
       )}

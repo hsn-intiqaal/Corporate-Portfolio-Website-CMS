@@ -1,11 +1,24 @@
 import type { Block } from 'payload'
 import { linkField } from '@/fields/link'
 import { sectionSettings } from '@/fields/palette'
+import { vmsg } from '@/fields/messages'
 
-export const iconOptions = ['check', 'star', 'users', 'building', 'calendar', 'award', 'globe', 'tools', 'shield', 'clock', 'drop', 'leaf'] as const
+export const iconOptions = [
+  'check',
+  'star',
+  'users',
+  'building',
+  'calendar',
+  'award',
+  'globe',
+  'tools',
+  'shield',
+  'clock',
+  'drop',
+  'leaf',
+] as const
 
-const heading = (name = 'title', required = false) =>
-  ({ name, type: 'text', localized: true, required }) as const
+const heading = (name = 'title', required = false) => ({ name, type: 'text', localized: true, required }) as const
 const intro = { name: 'intro', type: 'textarea', localized: true } as const
 
 export const HeroBlock: Block = {
@@ -377,8 +390,20 @@ export const LatestArticlesBlock: Block = {
         { label: 'Pick articles', value: 'selected' },
       ],
     },
-    { name: 'articles', type: 'relationship', relationTo: 'articles', hasMany: true, admin: { condition: (_, s) => s?.mode === 'selected' } },
-    { name: 'categories', type: 'relationship', relationTo: 'article-categories', hasMany: true, admin: { condition: (_, s) => s?.mode === 'category' } },
+    {
+      name: 'articles',
+      type: 'relationship',
+      relationTo: 'articles',
+      hasMany: true,
+      admin: { condition: (_, s) => s?.mode === 'selected' },
+    },
+    {
+      name: 'categories',
+      type: 'relationship',
+      relationTo: 'article-categories',
+      hasMany: true,
+      admin: { condition: (_, s) => s?.mode === 'category' },
+    },
     { name: 'limit', type: 'number', defaultValue: 3, min: 1, max: 12 },
     { name: 'showViewAll', type: 'checkbox', defaultValue: true, label: 'Show "View all" link' },
     sectionSettings,
@@ -447,8 +472,10 @@ export const VideoBlock: Block = {
       type: 'text',
       required: true,
       admin: { description: 'YouTube or Vimeo link. The player loads only when the visitor clicks play (faster and privacy-friendly).' },
-      validate: (v: unknown) =>
-        (typeof v === 'string' && /^(https:\/\/)(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|vimeo\.com\/)/.test(v)) || 'Paste a YouTube or Vimeo URL',
+      validate: (v: unknown, o: unknown) =>
+        (typeof v === 'string' &&
+          /^(https:\/\/)(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|vimeo\.com\/)/.test(v)) ||
+        vmsg(o, 'Paste a YouTube or Vimeo URL', 'الصق رابط يوتيوب أو فيميو'),
     },
     { name: 'poster', type: 'upload', relationTo: 'media', admin: { description: 'Cover image shown before playing (recommended).' } },
     sectionSettings,

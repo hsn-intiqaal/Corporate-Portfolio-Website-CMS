@@ -24,7 +24,13 @@ export const Services: CollectionConfig = {
         {
           label: 'Content',
           fields: [
-            { name: 'excerpt', type: 'textarea', localized: true, maxLength: 280, admin: { description: 'Short summary shown on service cards (max 280 characters).' } },
+            {
+              name: 'excerpt',
+              type: 'textarea',
+              localized: true,
+              maxLength: 280,
+              admin: { description: 'Short summary shown on service cards (max 280 characters).' },
+            },
             {
               type: 'row',
               fields: [

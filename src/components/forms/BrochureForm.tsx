@@ -6,7 +6,17 @@ import type { Dictionary } from '@/i18n/dictionary'
 import type { LeadFormState } from '@/lib/leads'
 import { Turnstile } from './Turnstile'
 
-export function BrochureForm({ locale, t, documentId, labels }: { locale: 'ar' | 'en'; t: Dictionary['form']; documentId: number; labels: { download: string; ready: string; now: string } }) {
+export function BrochureForm({
+  locale,
+  t,
+  documentId,
+  labels,
+}: {
+  locale: 'ar' | 'en'
+  t: Dictionary['form']
+  documentId: number
+  labels: { download: string; ready: string; now: string }
+}) {
   const [state, action, pending] = useActionState<LeadFormState, FormData>(submitLead, { status: 'idle' })
   const [startedAt] = useState(() => Date.now())
   const pathname = usePathname()

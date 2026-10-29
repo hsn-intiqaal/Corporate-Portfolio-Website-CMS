@@ -11,22 +11,47 @@ const bg = {
   white: 'bg-white',
   light: 'bg-soft',
   primary: 'bg-brand text-white on-dark',
-  dark: 'bg-ink text-white on-dark',
+  dark: 'bg-dark text-white on-dark',
   accent: 'bg-accent/10',
 }
 const pad = { compact: 'py-10 sm:py-12', normal: 'py-16 sm:py-20', spacious: 'py-20 sm:py-28' }
 
 export const isDarkBg = (s?: SectionSettings | null) => s?.background === 'primary' || s?.background === 'dark'
 
-export function Section({ settings, className = '', children, as: Tag = 'section', ...rest }: { settings?: SectionSettings | null; className?: string; children: React.ReactNode; as?: 'section' | 'div' } & React.HTMLAttributes<HTMLElement>) {
+export function Section({
+  settings,
+  className = '',
+  children,
+  as: Tag = 'section',
+  ...rest
+}: {
+  settings?: SectionSettings | null
+  className?: string
+  children: React.ReactNode
+  as?: 'section' | 'div'
+} & React.HTMLAttributes<HTMLElement>) {
   return (
-    <Tag id={settings?.anchor || undefined} className={`${bg[settings?.background ?? 'white']} ${pad[settings?.spacing ?? 'normal']} ${className}`} {...rest}>
+    <Tag
+      id={settings?.anchor || undefined}
+      className={`${bg[settings?.background ?? 'white']} ${pad[settings?.spacing ?? 'normal']} ${className}`}
+      {...rest}
+    >
       {children}
     </Tag>
   )
 }
 
-export function SectionHeading({ title, intro, eyebrow, center = false }: { title?: string | null; intro?: string | null; eyebrow?: string | null; center?: boolean }) {
+export function SectionHeading({
+  title,
+  intro,
+  eyebrow,
+  center = false,
+}: {
+  title?: string | null
+  intro?: string | null
+  eyebrow?: string | null
+  center?: boolean
+}) {
   if (!title && !intro) return null
   return (
     <div className={`mb-10 max-w-3xl ${center ? 'mx-auto text-center' : ''}`}>

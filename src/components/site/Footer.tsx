@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React from 'react'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import type { Locale } from '@/i18n/config'
 import { getFooter, getSettings } from '@/lib/data'
 import { formatYear } from '@/lib/format'
@@ -11,12 +11,12 @@ import { NewsletterForm } from '../forms/NewsletterForm'
 
 export async function Footer({ locale }: { locale: Locale }) {
   const [footer, settings] = await Promise.all([getFooter(locale), getSettings(locale)])
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   const numerals = settings.arabicNumerals ?? 'western'
   const logo = settings.logoLight ?? settings.logo
 
   return (
-    <footer className="on-dark bg-ink text-white/80">
+    <footer className="on-dark bg-dark text-white/80">
       <div className="container-site grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-1">
           <Link href={`/${locale}`} className="inline-block">
@@ -33,7 +33,13 @@ export async function Footer({ locale }: { locale: Locale }) {
               <ul className="flex flex-wrap gap-2">
                 {settings.social.map((s) => (
                   <li key={s.id ?? s.url}>
-                    <a href={s.url} target="_blank" rel="noopener noreferrer" className="flex size-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20" aria-label={s.platform}>
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex size-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
+                      aria-label={s.platform}
+                    >
                       <SocialIcon platform={s.platform} className="size-4" />
                     </a>
                   </li>
@@ -62,13 +68,17 @@ export async function Footer({ locale }: { locale: Locale }) {
             {settings.phone && (
               <li className="flex items-start gap-2">
                 <Icon name="phone" className="mt-0.5 size-4 shrink-0" />
-                <a href={`tel:${settings.phone.replace(/\s/g, '')}`} dir="ltr" className="hover:text-white">{settings.phone}</a>
+                <a href={`tel:${settings.phone.replace(/\s/g, '')}`} dir="ltr" className="hover:text-white">
+                  {settings.phone}
+                </a>
               </li>
             )}
             {settings.email && (
               <li className="flex items-start gap-2">
                 <Icon name="mail" className="mt-0.5 size-4 shrink-0" />
-                <a href={`mailto:${settings.email}`} className="hover:text-white">{settings.email}</a>
+                <a href={`mailto:${settings.email}`} className="hover:text-white">
+                  {settings.email}
+                </a>
               </li>
             )}
             {settings.address && (

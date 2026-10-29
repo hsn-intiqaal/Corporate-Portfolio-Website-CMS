@@ -4,7 +4,7 @@ import React from 'react'
 import { TranslationNotice } from '@/components/site/Notices'
 import { RenderSections } from '@/components/sections/RenderSections'
 import { isLocale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { getPage, getSettings } from '@/lib/data'
 import { buildMetadata } from '@/lib/seo'
 
@@ -26,7 +26,7 @@ export default async function HomePage({ params }: Props) {
   if (!res) notFound()
   return (
     <>
-      <TranslationNotice show={res.fallbackUsed} t={getDictionary(locale)} />
+      <TranslationNotice show={res.fallbackUsed} t={await getTexts(locale)} />
       <RenderSections sections={res.doc.layout} locale={locale} numerals={settings.arabicNumerals ?? 'western'} />
     </>
   )

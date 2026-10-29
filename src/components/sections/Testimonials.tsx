@@ -15,7 +15,9 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
               <Icon name="quote" className="mb-4 size-8 text-accent/60" />
               <blockquote className="flex-1 text-lg leading-relaxed text-ink/90">{item.quote}</blockquote>
               <figcaption className="mt-6 flex items-center gap-3">
-                {item.photo && typeof item.photo === 'object' && <Media resource={item.photo} size="thumbnail" imgClassName="size-12 rounded-full object-cover" sizes="48px" />}
+                {item.photo && typeof item.photo === 'object' && (
+                  <Media resource={item.photo} size="thumbnail" imgClassName="size-12 rounded-full object-cover" sizes="48px" />
+                )}
                 <div>
                   <div className="font-semibold">{item.name}</div>
                   {item.role && <div className="text-sm text-muted">{item.role}</div>}

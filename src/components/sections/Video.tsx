@@ -1,7 +1,7 @@
 import React from 'react'
 import type { VideoBlock } from '@/payload-types'
 import type { Locale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { Media } from '../site/Media'
 import { Section, SectionHeading } from '../site/Section'
 import { VideoPlayer } from './VideoPlayer'
@@ -15,10 +15,10 @@ export const toEmbedUrl = (url: string): string | null => {
   return null
 }
 
-export function Video({ block, locale }: { block: VideoBlock; locale: Locale }) {
+export async function Video({ block, locale }: { block: VideoBlock; locale: Locale }) {
   const embed = toEmbedUrl(block.url)
   if (!embed) return null
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   const ytId = embed.match(/embed\/([\w-]{11})/)?.[1]
   const poster =
     block.poster && typeof block.poster === 'object' ? (

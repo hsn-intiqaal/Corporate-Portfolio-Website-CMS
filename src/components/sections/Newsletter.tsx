@@ -1,12 +1,12 @@
 import React from 'react'
 import type { NewsletterBlock } from '@/payload-types'
 import type { Locale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { NewsletterForm } from '../forms/NewsletterForm'
 import { isDarkBg, Section } from '../site/Section'
 
-export function Newsletter({ block, locale }: { block: NewsletterBlock; locale: Locale }) {
-  const t = getDictionary(locale).newsletter
+export async function Newsletter({ block, locale }: { block: NewsletterBlock; locale: Locale }) {
+  const t = (await getTexts(locale)).newsletter
   const dark = isDarkBg(block.settings)
   return (
     <Section settings={block.settings}>

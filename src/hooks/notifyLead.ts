@@ -13,9 +13,21 @@ export const notifyNewLead: CollectionAfterChangeHook = async ({ doc, operation,
   if (operation !== 'create') return doc
   const { payload } = req
   await sendWebhook(payload, 'lead.created', {
-    id: doc.id, type: doc.type, locale: doc.locale, name: doc.name, email: doc.email, phone: doc.phone, company: doc.company,
-    subject: doc.subject, message: doc.message, service: doc.service, projectLocation: doc.projectLocation, timeline: doc.timeline,
-    budget: doc.budget, sourcePage: doc.sourcePage, createdAt: doc.createdAt,
+    id: doc.id,
+    type: doc.type,
+    locale: doc.locale,
+    name: doc.name,
+    email: doc.email,
+    phone: doc.phone,
+    company: doc.company,
+    subject: doc.subject,
+    message: doc.message,
+    service: doc.service,
+    projectLocation: doc.projectLocation,
+    timeline: doc.timeline,
+    budget: doc.budget,
+    sourcePage: doc.sourcePage,
+    createdAt: doc.createdAt,
     adminUrl: `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/admin/collections/leads/${doc.id}`,
   })
   try {
@@ -40,7 +52,9 @@ export const notifyNewLead: CollectionAfterChangeHook = async ({ doc, operation,
     let serviceTitle = ''
     if (doc.service) {
       const id = typeof doc.service === 'object' ? doc.service.id : doc.service
-      const service = await payload.findByID({ collection: 'services', id, depth: 0, locale: 'en', req, overrideAccess: true }).catch(() => null)
+      const service = await payload
+        .findByID({ collection: 'services', id, depth: 0, locale: 'en', req, overrideAccess: true })
+        .catch(() => null)
       serviceTitle = service?.title ?? ''
     }
 
@@ -67,7 +81,10 @@ export const notifyNewLead: CollectionAfterChangeHook = async ({ doc, operation,
       <h2>New ${escape(kind.toLowerCase())} — reply in ${escape(language)}</h2>
       <table cellpadding="6" style="border-collapse:collapse">${rows
         .filter(([, v]) => v !== undefined && v !== null && v !== '')
-        .map(([k, v]) => `<tr><td style="color:#555;vertical-align:top"><b>${escape(k)}</b></td><td style="white-space:pre-wrap" dir="auto">${escape(v)}</td></tr>`)
+        .map(
+          ([k, v]) =>
+            `<tr><td style="color:#555;vertical-align:top"><b>${escape(k)}</b></td><td style="white-space:pre-wrap" dir="auto">${escape(v)}</td></tr>`,
+        )
         .join('')}</table>
       <p><a href="${escape(adminUrl)}">Open this lead in the dashboard</a></p></div>`
 

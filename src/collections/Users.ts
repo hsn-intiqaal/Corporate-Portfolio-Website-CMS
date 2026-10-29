@@ -76,7 +76,10 @@ export const Users: CollectionConfig = {
       name: 'receivesLeadEmails',
       type: 'checkbox',
       defaultValue: false,
-      admin: { description: 'Administrators only: also send new enquiry notifications to this user.', condition: (_, __, { user }) => isAdmin({ user } as never) },
+      admin: {
+        description: 'Administrators only: also send new enquiry notifications to this user.',
+        condition: (_, __, { user }) => isAdmin({ user } as never),
+      },
     },
   ],
   timestamps: true,

@@ -15,7 +15,9 @@ export function Process({ block, locale, numerals }: { block: ProcessBlock; loca
           {(block.steps ?? []).map((step, i) => (
             <li key={step.id} className={`relative rounded-2xl p-6 ${dark ? 'bg-white/10' : 'bg-white shadow-sm ring-1 ring-line'}`}>
               <div className="mb-4 flex items-center gap-3">
-                <span className={`flex size-10 items-center justify-center rounded-full text-sm font-bold ${dark ? 'bg-white text-brand-dark' : 'bg-brand text-white'}`}>
+                <span
+                  className={`flex size-10 items-center justify-center rounded-full text-sm font-bold ${dark ? 'bg-white text-brand-dark' : 'bg-brand text-white'}`}
+                >
                   {formatNumber(i + 1, locale, numerals)}
                 </span>
                 {step.icon && <Icon name={step.icon} className={`size-6 ${dark ? 'text-white/80' : 'text-accent'}`} />}

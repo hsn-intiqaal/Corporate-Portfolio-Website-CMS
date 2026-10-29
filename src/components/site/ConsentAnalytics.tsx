@@ -1,26 +1,26 @@
 'use client'
 import Script from 'next/script'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { notifyClientValues, useClientValue } from '@/lib/useClientValue'
 
 import { CONSENT_EVENT, CONSENT_KEY as KEY } from './ThirdPartyScripts'
 
 /** Loads Google Analytics only after the visitor accepts. Rendered only when NEXT_PUBLIC_GA_ID is set. */
 /** Cookie consent banner. Loads Google Analytics (when configured) and consent-gated third-party scripts only after the visitor accepts. */
 export function ConsentAnalytics({ gaId, text, accept, decline }: { gaId?: string; text: string; accept: string; decline: string }) {
-  const [consent, setConsent] = useState<'granted' | 'denied' | null>(null)
-  const [ready, setReady] = useState(false)
-  useEffect(() => {
+  // undefined = not yet known (server render), null = no choice made yet.
+  const consent = useClientValue<string | null | undefined>(() => {
     try {
-      const v = localStorage.getItem(KEY)
-      if (v === 'granted' || v === 'denied') setConsent(v)
-    } catch {}
-    setReady(true)
-  }, [])
+      return localStorage.getItem(KEY)
+    } catch {
+      return null
+    }
+  }, undefined)
   const choose = (v: 'granted' | 'denied') => {
-    setConsent(v)
     try {
       localStorage.setItem(KEY, v)
     } catch {}
+    notifyClientValues()
     window.dispatchEvent(new Event(CONSENT_EVENT))
   }
   return (
@@ -33,8 +33,12 @@ export function ConsentAnalytics({ gaId, text, accept, decline }: { gaId?: strin
           </Script>
         </>
       )}
-      {ready && consent === null && (
-        <div role="dialog" aria-live="polite" className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-2xl flex-col gap-3 rounded-2xl bg-ink p-5 text-sm text-white shadow-2xl sm:flex-row sm:items-center">
+      {consent === null && (
+        <div
+          role="dialog"
+          aria-live="polite"
+          className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-2xl flex-col gap-3 rounded-2xl bg-dark p-5 text-sm text-white shadow-2xl sm:flex-row sm:items-center"
+        >
           <p className="flex-1">{text}</p>
           <div className="flex gap-2">
             <button type="button" className="btn btn-light py-2" onClick={() => choose('granted')}>

@@ -29,6 +29,7 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { LeadsExportButton as LeadsExportButton_4dae63d6cd2be49e2eb49e672f3e2107 } from '@/components/admin/LeadsExportButton'
 import { SubscribersExportButton as SubscribersExportButton_97173ee59d81319c51eff7eacdb2cca5 } from '@/components/admin/SubscribersExportButton'
+import { ColorPicker as ColorPicker_818c03bd2d1805855e4e5373b5a37a82 } from '@/components/admin/ColorPicker'
 import { DashboardPanel as DashboardPanel_b3cbd5aec48b927366f6773544af155a } from '@/components/admin/DashboardPanel'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -66,6 +67,7 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@/components/admin/LeadsExportButton#LeadsExportButton": LeadsExportButton_4dae63d6cd2be49e2eb49e672f3e2107,
   "@/components/admin/SubscribersExportButton#SubscribersExportButton": SubscribersExportButton_97173ee59d81319c51eff7eacdb2cca5,
+  "@/components/admin/ColorPicker#ColorPicker": ColorPicker_818c03bd2d1805855e4e5373b5a37a82,
   "@/components/admin/DashboardPanel#DashboardPanel": DashboardPanel_b3cbd5aec48b927366f6773544af155a,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24

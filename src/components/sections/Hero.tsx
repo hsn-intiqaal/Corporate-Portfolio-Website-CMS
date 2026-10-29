@@ -4,7 +4,7 @@ import type { Locale } from '@/i18n/config'
 import { CMSLink, type LinkData } from '../site/CMSLink'
 import { Media } from '../site/Media'
 
-const overlays = { none: '', light: 'bg-ink/25', medium: 'bg-ink/50', strong: 'bg-ink/70' }
+const overlays = { none: '', light: 'bg-dark/25', medium: 'bg-dark/50', strong: 'bg-dark/70' }
 const heights = { medium: 'min-h-[22rem] sm:min-h-[26rem]', large: 'min-h-[30rem] sm:min-h-[36rem]', full: 'min-h-[calc(100svh-5rem)]' }
 
 export function Hero({ block, locale, first }: { block: HeroBlock; locale: Locale; first?: boolean }) {
@@ -12,7 +12,10 @@ export function Hero({ block, locale, first }: { block: HeroBlock; locale: Local
   const center = block.alignment === 'center'
   const Heading = first ? 'h1' : 'h2'
   return (
-    <section id={block.settings?.anchor || undefined} className={`on-dark relative isolate flex items-center overflow-hidden ${heights[block.height ?? 'large']} ${hasImage ? 'bg-ink' : 'bg-gradient-to-br from-brand-dark via-brand to-accent'}`}>
+    <section
+      id={block.settings?.anchor || undefined}
+      className={`on-dark relative isolate flex items-center overflow-hidden ${heights[block.height ?? 'large']} ${hasImage ? 'bg-dark' : 'bg-gradient-to-br from-brand-dark via-brand to-accent'}`}
+    >
       {hasImage && (
         <>
           <Media resource={block.backgroundImage} fill priority={first} imgClassName="-z-20 object-cover" sizes="100vw" />

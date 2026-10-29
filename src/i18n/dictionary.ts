@@ -42,7 +42,7 @@ const en = {
   articles: 'Articles',
   latestArticles: 'Latest articles',
   readArticle: 'Read article',
-  minRead: (n: string) => `${n} min read`,
+  minRead: '{n} min read',
   publishedOn: 'Published',
   updatedOn: 'Updated',
   by: 'By',
@@ -52,13 +52,13 @@ const en = {
   linkCopied: 'Link copied',
   relatedArticles: 'Related articles',
   allCategories: 'All',
-  pageOf: (a: string, b: string) => `Page ${a} of ${b}`,
+  pageOf: 'Page {page} of {total}',
   noArticles: 'No articles yet.',
   tags: 'Tags',
   rss: 'RSS feed',
   search: 'Search',
   searchPlaceholder: 'Search services, projects and articles…',
-  searchResults: (n: string, q: string) => `${n} results for “${q}”`,
+  searchResults: '{count} results for “{query}”',
   noResults: 'No results found. Try different words.',
   watchVideo: 'Play video',
   download: 'Download',
@@ -112,7 +112,8 @@ const en = {
   },
 }
 
-export type Dictionary = typeof en
+/** Same shape as `en`, with every value a plain string so it can be edited in the dashboard. */
+export type Dictionary = { [K in keyof typeof en]: (typeof en)[K] extends string ? string : { [J in keyof (typeof en)[K]]: string } }
 
 const ar: Dictionary = {
   skipToContent: 'انتقل إلى المحتوى',
@@ -156,7 +157,7 @@ const ar: Dictionary = {
   articles: 'المقالات',
   latestArticles: 'أحدث المقالات',
   readArticle: 'اقرأ المقال',
-  minRead: (n: string) => `مدة القراءة ${n} دقيقة`,
+  minRead: 'مدة القراءة {n} دقيقة',
   publishedOn: 'نُشر في',
   updatedOn: 'آخر تحديث',
   by: 'بقلم',
@@ -166,13 +167,13 @@ const ar: Dictionary = {
   linkCopied: 'تم نسخ الرابط',
   relatedArticles: 'مقالات ذات صلة',
   allCategories: 'الكل',
-  pageOf: (a: string, b: string) => `صفحة ${a} من ${b}`,
+  pageOf: 'صفحة {page} من {total}',
   noArticles: 'لا توجد مقالات حالياً.',
   tags: 'الوسوم',
   rss: 'خلاصة RSS',
   search: 'بحث',
   searchPlaceholder: 'ابحث في الخدمات والمشاريع والمقالات…',
-  searchResults: (n: string, q: string) => `${n} نتيجة للبحث عن «${q}»`,
+  searchResults: '{count} نتيجة للبحث عن «{query}»',
   noResults: 'لا توجد نتائج. جرّب كلمات أخرى.',
   watchVideo: 'تشغيل الفيديو',
   download: 'تحميل',
@@ -226,5 +227,9 @@ const ar: Dictionary = {
   },
 }
 
-const dictionaries: Record<Locale, Dictionary> = { ar, en }
-export const getDictionary = (locale: Locale): Dictionary => dictionaries[locale]
+/** Built-in texts. Editors can override any of them in the dashboard (Site texts); see lib/texts.ts. */
+export const defaultDictionaries: Record<Locale, Dictionary> = { ar, en }
+
+/** Fills `{name}` placeholders, e.g. fmt('Page {page} of {total}', { page: 2, total: 5 }). */
+export const fmt = (template: string, vars: Record<string, string | number>) =>
+  template.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m))

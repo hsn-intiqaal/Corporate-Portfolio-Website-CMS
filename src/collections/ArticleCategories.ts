@@ -12,7 +12,12 @@ export const ArticleCategories: CollectionConfig = {
   hooks: { afterChange: [revalidateAfterChange], afterDelete: [revalidateAfterDelete] },
   fields: [
     { name: 'title', type: 'text', localized: true, required: true },
-    { name: 'description', type: 'textarea', localized: true, admin: { description: 'Shown on the category page and used as its meta description.' } },
+    {
+      name: 'description',
+      type: 'textarea',
+      localized: true,
+      admin: { description: 'Shown on the category page and used as its meta description.' },
+    },
     slugField(),
   ],
 }

@@ -21,10 +21,7 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      new URL(serverURL),
-      ...(process.env.S3_PUBLIC_URL ? [new URL(process.env.S3_PUBLIC_URL)] : []),
-    ].map((url) => ({
+    remotePatterns: [new URL(serverURL), ...(process.env.S3_PUBLIC_URL ? [new URL(process.env.S3_PUBLIC_URL)] : [])].map((url) => ({
       protocol: url.protocol.replace(':', ''),
       hostname: url.hostname,
       port: url.port,

@@ -55,7 +55,10 @@ export const Pages: CollectionConfig = {
               label: 'Sections',
               type: 'blocks',
               blocks: sectionBlocks,
-              admin: { initCollapsed: true, description: 'Add, reorder, duplicate or remove sections. Each section can be hidden without deleting it.' },
+              admin: {
+                initCollapsed: true,
+                description: 'Add, reorder, duplicate or remove sections. Each section can be hidden without deleting it.',
+              },
             },
           ],
         },

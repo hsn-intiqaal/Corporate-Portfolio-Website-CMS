@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 import type { Project, ProjectGalleryBlock } from '@/payload-types'
 import type { Locale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { getProjects } from '@/lib/data'
 import type { NumeralStyle } from '@/lib/format'
 import { Icon } from '../site/Icon'
@@ -16,7 +16,7 @@ export async function ProjectGallery({ block, locale, numerals }: { block: Proje
   let projects: Project[] = await getProjects(locale, { featured: block.mode === 'featured', ids, categoryIds, limit: block.limit ?? 6 })
   if (ids) projects = ids.map((id) => projects.find((p) => p.id === id)).filter(Boolean) as Project[]
   if (projects.length === 0) return null
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   const cards = projects.map((p) => <ProjectCard key={p.id} project={p} locale={locale} numerals={numerals} />)
   return (
     <Section settings={block.settings}>
@@ -30,7 +30,9 @@ export async function ProjectGallery({ block, locale, numerals }: { block: Proje
           )}
         </div>
         {block.layout === 'carousel' ? (
-          <Carousel previousLabel={t.previous} nextLabel={t.next}>{cards}</Carousel>
+          <Carousel previousLabel={t.previous} nextLabel={t.next}>
+            {cards}
+          </Carousel>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{cards}</div>
         )}

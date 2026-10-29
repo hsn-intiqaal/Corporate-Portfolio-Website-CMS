@@ -9,5 +9,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
   const payload = await getPayloadClient()
   const doc = await payload.findByID({ collection: 'documents', id: Number(id), depth: 0, overrideAccess: true }).catch(() => null)
   if (!doc?.filename) return new Response('Not found', { status: 404 })
-  return Response.redirect(new URL(`/api/documents/file/${encodeURIComponent(doc.filename)}?t=${encodeURIComponent(token)}`, _request.url), 302)
+  return Response.redirect(
+    new URL(`/api/documents/file/${encodeURIComponent(doc.filename)}?t=${encodeURIComponent(token)}`, _request.url),
+    302,
+  )
 }

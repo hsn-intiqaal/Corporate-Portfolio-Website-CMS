@@ -18,5 +18,7 @@ export const formatYear = (year: number, locale: Locale, numerals: NumeralStyle 
 
 export const formatDate = (iso: string | null | undefined, locale: Locale, numerals: NumeralStyle = 'western') => {
   if (!iso) return ''
-  return new Intl.DateTimeFormat(intlLocale(locale, numerals), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(iso))
+  return new Intl.DateTimeFormat(intlLocale(locale, numerals), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+    new Date(iso),
+  )
 }

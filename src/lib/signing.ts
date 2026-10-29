@@ -1,6 +1,10 @@
 import crypto from 'node:crypto'
 
-const key = () => crypto.createHash('sha256').update(`downloads:${process.env.PAYLOAD_SECRET || ''}`).digest()
+const key = () =>
+  crypto
+    .createHash('sha256')
+    .update(`downloads:${process.env.PAYLOAD_SECRET || ''}`)
+    .digest()
 
 /** Creates a URL-safe token `<id>.<expiry>.<signature>` valid for `ttlSeconds`. */
 export const signToken = (id: string | number, ttlSeconds = 60 * 60 * 24) => {

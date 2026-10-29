@@ -29,6 +29,11 @@ export const Header: GlobalConfig = {
       ],
     },
     { name: 'showQuoteButton', type: 'checkbox', defaultValue: true, label: 'Show "Request a quotation" button' },
-    linkField({ name: 'quoteButton', label: 'Quote button (leave empty for /request-a-quote)', required: false, condition: (d) => Boolean(d?.showQuoteButton) }),
+    linkField({
+      name: 'quoteButton',
+      label: 'Quote button (leave empty for /request-a-quote)',
+      required: false,
+      condition: (d) => Boolean(d?.showQuoteButton),
+    }),
   ],
 }

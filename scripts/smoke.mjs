@@ -50,7 +50,15 @@ check('robots.txt is served', async () => {
   if (r.status !== 200) throw new Error(`status ${r.status}`)
 })
 check('Leads are not public', async () => {
-  for (const path of ['/api/leads', '/api/lead-files', '/api/leads/export-csv', '/api/audit-logs', '/api/subscribers', '/api/documents', '/api/subscribers/export-csv']) {
+  for (const path of [
+    '/api/leads',
+    '/api/lead-files',
+    '/api/leads/export-csv',
+    '/api/audit-logs',
+    '/api/subscribers',
+    '/api/documents',
+    '/api/subscribers/export-csv',
+  ]) {
     const r = await get(path)
     if (r.status !== 403 && r.status !== 401) throw new Error(`${path} returned ${r.status}`)
   }

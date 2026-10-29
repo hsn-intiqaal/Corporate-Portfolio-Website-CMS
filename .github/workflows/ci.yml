@@ -32,6 +32,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+      - name: Unit tests (includes the check that every dashboard string has an Arabic translation)
+        run: pnpm test
       - name: Apply migrations to an empty database
         run: pnpm payload migrate
       - name: Check migrations match the schema

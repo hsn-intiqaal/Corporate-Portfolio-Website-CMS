@@ -10,7 +10,7 @@ import { TranslationNotice } from '@/components/site/Notices'
 import { PageHeader } from '@/components/site/PageHeader'
 import { RichText } from '@/components/site/RichText'
 import { isLocale, locales } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { followRedirect, getAllSlugs, getProject, getSettings } from '@/lib/data'
 import { formatMonthYear } from '@/lib/format'
 import { absoluteURL, docPath } from '@/lib/paths'
@@ -33,7 +33,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const [res, settings] = await Promise.all([getProject(decodeURIComponent(slug), locale), getSettings(locale)])
   if (!res) return {}
   const p = res.doc
-  return buildMetadata({ locale, path: `/projects/${p.slug}`, meta: p.meta, fallbackTitle: p.title, fallbackDescription: p.excerpt, fallbackImage: p.coverImage, settings })
+  return buildMetadata({
+    locale,
+    path: `/projects/${p.slug}`,
+    meta: p.meta,
+    fallbackTitle: p.title,
+    fallbackDescription: p.excerpt,
+    fallbackImage: p.coverImage,
+    settings,
+  })
 }
 
 export default async function ProjectPage({ params }: Props) {
@@ -46,7 +54,7 @@ export default async function ProjectPage({ params }: Props) {
     notFound()
   }
   const project = res.doc
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   const settings = await getSettings(locale)
   const numerals = settings.arabicNumerals ?? 'western'
   const path = docPath('projects', project.slug, locale)
@@ -77,7 +85,13 @@ export default async function ProjectPage({ params }: Props) {
       <section className="py-16 sm:py-20">
         <div className="container-site grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <Media resource={project.coverImage} size="large" priority imgClassName="aspect-[16/10] w-full rounded-2xl object-cover" sizes="(max-width: 1024px) 100vw, 66vw" />
+            <Media
+              resource={project.coverImage}
+              size="large"
+              priority
+              imgClassName="aspect-[16/10] w-full rounded-2xl object-cover"
+              sizes="(max-width: 1024px) 100vw, 66vw"
+            />
             <RichText data={project.content} locale={locale} className="mt-10 text-lg" />
             {gallery.length > 0 && (
               <div className="mt-12">
@@ -85,8 +99,18 @@ export default async function ProjectPage({ params }: Props) {
                 <ul className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {gallery.map((img) => (
                     <li key={img.id}>
-                      <a href={img.sizes?.large?.url || img.url || '#'} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl">
-                        <Media resource={img} size="card" imgClassName="aspect-[4/3] w-full object-cover transition duration-500 hover:scale-105" sizes="(max-width: 768px) 50vw, 25vw" />
+                      <a
+                        href={img.sizes?.large?.url || img.url || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block overflow-hidden rounded-xl"
+                      >
+                        <Media
+                          resource={img}
+                          size="card"
+                          imgClassName="aspect-[4/3] w-full object-cover transition duration-500 hover:scale-105"
+                          sizes="(max-width: 768px) 50vw, 25vw"
+                        />
                       </a>
                     </li>
                   ))}
@@ -112,7 +136,10 @@ export default async function ProjectPage({ params }: Props) {
                   {services.map((s) =>
                     typeof s === 'object' ? (
                       <li key={s.id}>
-                        <Link href={docPath('services', s.slug, locale)} className="flex items-center gap-2 py-1 text-brand hover:underline">
+                        <Link
+                          href={docPath('services', s.slug, locale)}
+                          className="flex items-center gap-2 py-1 text-brand hover:underline"
+                        >
                           <Icon name="check" className="size-4" /> {s.title}
                         </Link>
                       </li>

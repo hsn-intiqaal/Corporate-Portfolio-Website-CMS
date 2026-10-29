@@ -1,19 +1,20 @@
 # Corporate Portfolio Website & CMS
 
 A bilingual (Arabic RTL / English LTR) corporate website with a secure content dashboard, built to the
-*Corporate Portfolio Website & CMS* project proposal.
+_Corporate Portfolio Website & CMS_ project proposal.
 
 **Stack:** Next.js 16 · React 19 · TypeScript · Payload CMS 3 · PostgreSQL · Tailwind CSS 4
 
-| Document | For |
-|---|---|
-| [docs/HOSTING.md](docs/HOSTING.md) | Hosting plan, costs, launch steps, backups, security checklist |
-| [docs/EDITOR_GUIDE.md](docs/EDITOR_GUIDE.md) | Client editors and administrators |
-| This README | Developers (technical handover) |
+| Document                                     | For                                                            |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| [docs/HOSTING.md](docs/HOSTING.md)           | Hosting plan, costs, launch steps, backups, security checklist |
+| [docs/EDITOR_GUIDE.md](docs/EDITOR_GUIDE.md) | Client editors and administrators                              |
+| This README                                  | Developers (technical handover)                                |
 
 ## Features
 
 **Public website** (`/ar/...` and `/en/...`)
+
 - Home, About, Services overview and detail pages, Projects overview (category filter) and detail pages, Contact,
   Request a quotation, legal pages, custom pages, branded 404
 - Full RTL layout for Arabic with mirrored navigation and direction-aware icons, IBM Plex Sans Arabic + Inter,
@@ -38,6 +39,7 @@ A bilingual (Arabic RTL / English LTR) corporate website with a secure content d
 - WhatsApp button, optional Google Analytics that loads only after cookie consent, web app manifest, image sitemap entries
 
 **Dashboard** (`/admin`)
+
 - Home panel: enquiries chart (last 6 months), **SEO health** list (published items missing an SEO title or description, per language), drafts, latest leads, shortcuts
 - Articles, article categories and authors; downloadable documents; newsletter subscribers; rich text with tables
 - Pages built from 18 section types (hero, text & image, service cards, project gallery, project highlight, statistics,
@@ -45,7 +47,16 @@ A bilingual (Arabic RTL / English LTR) corporate website with a secure content d
   newsletter, brochure download): add, reorder, duplicate, hide, remove, with per-section background and spacing
 - Services (drag to order), Projects (gallery, categories, facts), Media library (required alt text, focal point, auto sizes)
 - Header and footer menus, which only link to published pages
-- Branding and settings: logo, approved colour palettes, contacts, social, map, SEO defaults, translation rule, lead recipients
+- Branding and settings: logo, contacts, social, map, SEO defaults, translation rule, lead recipients
+- **Design from the dashboard** (Settings → Design): ready-made palettes or fully custom colours (primary, dark shade,
+  accent, text, secondary text, dark sections/footer, light sections, page background) with a colour picker and
+  WCAG contrast checks that reject unreadable combinations; 8 Arabic and 8 English Google fonts (self-hosted) for body
+  and headings; text size; heading weight; corner radius; button shape; header colour, sticky header, search,
+  language switcher and WhatsApp toggles; custom CSS for advanced tweaks
+- **Site texts**: every fixed website text (buttons, labels, form messages, blog and newsletter wording) editable in
+  Arabic and English; empty fields fall back to the built-in wording
+- **Bilingual dashboard**: every label, description, option and message is available in Arabic and English and
+  follows each user's interface language (Arabic by default); a unit test fails if any string lacks a translation
 - Leads inbox: status, owner, internal notes, CSV export (formula-injection safe, UTF-8 BOM for Arabic in Excel)
 - Drafts, autosave, preview on the real site, version history with restore, scheduled publishing
 - Roles: Administrator / Editor. Editors cannot see leads, users or settings, cannot delete, and publish only if allowed
@@ -63,6 +74,7 @@ cp .env.example .env            # set DATABASE_URL and PAYLOAD_SECRET
 pnpm seed                       # demo content + admin@example.com / ChangeMe!2026 and editor@example.com
 pnpm dev                        # http://localhost:3000 (site) and http://localhost:3000/admin
 ```
+
 `pnpm seed --force` wipes content and reseeds (refused when `NODE_ENV=production`).
 Demo content, names, figures and images are generated placeholders. Replace them with the client's approved content.
 
@@ -77,13 +89,15 @@ pnpm generate:importmap         # after adding admin components
 
 ## Scripts
 
-| Script | Does |
-|---|---|
-| `pnpm dev` / `build` / `start` | Next.js |
-| `pnpm typecheck` | TypeScript |
-| `pnpm seed` | Demo content |
-| `pnpm test:smoke [url]` | Post-deploy checks (pages, SEO files, private data not exposed, headers) |
-| `pnpm vercel-build` | `payload migrate && next build` |
+| Script                         | Does                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| `pnpm dev` / `build` / `start` | Next.js                                                                  |
+| `pnpm typecheck`               | TypeScript                                                               |
+| `pnpm lint` / `pnpm format`    | ESLint (Next.js rules) / Prettier                                        |
+| `pnpm test`                    | Unit tests (Vitest)                                                      |
+| `pnpm seed`                    | Demo content                                                             |
+| `pnpm test:smoke [url]`        | Post-deploy checks (pages, SEO files, private data not exposed, headers) |
+| `pnpm vercel-build`            | `payload migrate && next build`                                          |
 
 ## Project structure
 
@@ -100,20 +114,31 @@ src/
   components/forms/          contact / quotation form
   collections/, globals/     content model and access rules
   hooks/                     revalidation, audit log, publish guard, slug redirects, lead email
-  lib/                       data loading, SEO, lead handling, formatting
+  lib/                       data loading, SEO, lead handling and validation, texts, formatting
+  theme/                     design options, colour/contrast helpers, theme CSS, self-hosted fonts
+  admin-i18n/                Arabic wording for the dashboard + the plugin that applies it
   migrations/                database migrations
-  seed/                      demo content
+  seed/                      demo content (helpers, content/, images, PDF)
+tests/unit/                  unit tests
 deploy/                      Docker Compose stack (app, Postgres, Caddy HTTPS, backups)
 ```
 
 ## Environment variables
+
 See [.env.example](.env.example). Required: `DATABASE_URL`, `PAYLOAD_SECRET`, `NEXT_PUBLIC_SERVER_URL`.
 S3 storage is required on serverless hosting. SMTP and Turnstile are strongly recommended for production.
 
+## Dashboard translations
+
+Labels written in English in the config are translated by `src/admin-i18n/localize.ts` using `src/admin-i18n/ar.ts`.
+After adding fields run `pnpm test`; the failing test lists any new string to add to `ar.ts`.
+
 ## Adding a section type (change request)
+
 1. Add the block config in `src/blocks/index.ts` and include it in `sectionBlocks`.
 2. Add the component in `src/components/sections/` and a `case` in `RenderSections.tsx`.
 3. `pnpm generate:types && pnpm migrate:create add-<block>`.
 
 ## License
+
 MIT for the custom code. Open-source dependencies keep their own licences.

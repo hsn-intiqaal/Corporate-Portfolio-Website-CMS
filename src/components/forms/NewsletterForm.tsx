@@ -11,7 +11,10 @@ export function NewsletterForm({ locale, t, dark }: { locale: 'ar' | 'en'; t: Di
   const pathname = usePathname()
   if (state.status === 'success') {
     return (
-      <p role="status" className={`rounded-xl p-4 text-sm font-medium ${dark ? 'bg-white/10 text-white' : 'bg-emerald-50 text-emerald-900'}`}>
+      <p
+        role="status"
+        className={`rounded-xl p-4 text-sm font-medium ${dark ? 'bg-white/10 text-white' : 'bg-emerald-50 text-emerald-900'}`}
+      >
         {state.message}
       </p>
     )

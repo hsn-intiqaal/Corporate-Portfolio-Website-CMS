@@ -11,7 +11,8 @@ import { TranslationNotice } from '@/components/site/Notices'
 import { RichText } from '@/components/site/RichText'
 import { ShareButtons } from '@/components/site/ShareButtons'
 import { isLocale, locales } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { fmt } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { followRedirect, getAllSlugs, getArticle, getArticles, getSettings } from '@/lib/data'
 import { formatDate, formatNumber } from '@/lib/format'
 import { extractHeadings } from '@/lib/lexical'
@@ -35,7 +36,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const [res, settings] = await Promise.all([getArticle(decodeURIComponent(slug), locale), getSettings(locale)])
   if (!res) return {}
   const a = res.doc
-  const meta = buildMetadata({ locale, path: `/blog/${a.slug}`, meta: a.meta, fallbackTitle: a.title, fallbackDescription: a.excerpt, fallbackImage: a.coverImage, settings })
+  const meta = buildMetadata({
+    locale,
+    path: `/blog/${a.slug}`,
+    meta: a.meta,
+    fallbackTitle: a.title,
+    fallbackDescription: a.excerpt,
+    fallbackImage: a.coverImage,
+    settings,
+  })
   const author = typeof a.author === 'object' && a.author ? a.author.name : undefined
   const tags = (a.tags ?? []).map((x) => x.tag).filter(Boolean)
   return {
@@ -64,7 +73,7 @@ export default async function ArticlePage({ params }: Props) {
     notFound()
   }
   const article = res.doc
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   const settings = await getSettings(locale)
   const numerals = settings.arabicNumerals ?? 'western'
   const path = docPath('articles', article.slug, locale)
@@ -78,7 +87,9 @@ export default async function ArticlePage({ params }: Props) {
   const picked = (article.relatedArticles ?? []).filter((r): r is Article => typeof r === 'object' && r !== null)
   let related: Article[] = picked
   if (related.length === 0) {
-    const sameCategory = categories.length ? (await getArticles(locale, { categoryIds: categories.map((c) => c.id), excludeId: article.id, limit: 3 })).docs : []
+    const sameCategory = categories.length
+      ? (await getArticles(locale, { categoryIds: categories.map((c) => c.id), excludeId: article.id, limit: 3 })).docs
+      : []
     related = sameCategory.length ? sameCategory : (await getArticles(locale, { excludeId: article.id, limit: 3 })).docs
   }
   const services = (article.relatedServices ?? []).filter((s) => typeof s === 'object' && s !== null)
@@ -92,10 +103,24 @@ export default async function ArticlePage({ params }: Props) {
           <div className="container-site max-w-4xl">
             <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted">
               <ol className="flex flex-wrap items-center gap-1.5">
-                <li><Link href={`/${locale}`} className="hover:text-brand">{t.home}</Link></li>
-                <li className="flex items-center gap-1.5"><Icon name="chevron" className="size-3.5" /><Link href={`/${locale}/blog`} className="hover:text-brand">{t.blog}</Link></li>
+                <li>
+                  <Link href={`/${locale}`} className="hover:text-brand">
+                    {t.home}
+                  </Link>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <Icon name="chevron" className="size-3.5" />
+                  <Link href={`/${locale}/blog`} className="hover:text-brand">
+                    {t.blog}
+                  </Link>
+                </li>
                 {categories[0] && (
-                  <li className="flex items-center gap-1.5"><Icon name="chevron" className="size-3.5" /><Link href={`/${locale}/blog/category/${categories[0].slug}`} className="hover:text-brand">{categories[0].title}</Link></li>
+                  <li className="flex items-center gap-1.5">
+                    <Icon name="chevron" className="size-3.5" />
+                    <Link href={`/${locale}/blog/category/${categories[0].slug}`} className="hover:text-brand">
+                      {categories[0].title}
+                    </Link>
+                  </li>
                 )}
               </ol>
             </nav>
@@ -104,7 +129,9 @@ export default async function ArticlePage({ params }: Props) {
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
               {author && (
                 <span className="flex items-center gap-2">
-                  {author.photo && typeof author.photo === 'object' && <Media resource={author.photo} size="thumbnail" imgClassName="size-8 rounded-full object-cover" sizes="32px" />}
+                  {author.photo && typeof author.photo === 'object' && (
+                    <Media resource={author.photo} size="thumbnail" imgClassName="size-8 rounded-full object-cover" sizes="32px" />
+                  )}
                   {t.by} <strong className="text-ink">{author.name}</strong>
                 </span>
               )}
@@ -113,13 +140,21 @@ export default async function ArticlePage({ params }: Props) {
                   {t.publishedOn} <time dateTime={article.publishedAt}>{formatDate(article.publishedAt, locale, numerals)}</time>
                 </span>
               )}
-              {article.readingTime ? <span>{t.minRead(formatNumber(article.readingTime, locale, numerals))}</span> : null}
+              {article.readingTime ? <span>{fmt(t.minRead, { n: formatNumber(article.readingTime, locale, numerals) })}</span> : null}
             </div>
           </div>
         </header>
 
         <div className="container-site max-w-6xl">
-          {cover && <Media resource={cover} size="large" priority imgClassName="-mt-2 aspect-[16/9] w-full rounded-2xl object-cover shadow-lg" sizes="(max-width: 1280px) 100vw, 1200px" />}
+          {cover && (
+            <Media
+              resource={cover}
+              size="large"
+              priority
+              imgClassName="-mt-2 aspect-[16/9] w-full rounded-2xl object-cover shadow-lg"
+              sizes="(max-width: 1280px) 100vw, 1200px"
+            />
+          )}
         </div>
 
         <div className="container-site grid max-w-6xl gap-12 py-12 lg:grid-cols-[1fr_16rem]">
@@ -129,7 +164,12 @@ export default async function ArticlePage({ params }: Props) {
               <ul aria-label={t.tags} className="mt-10 flex flex-wrap gap-2">
                 {tags.map((tag) => (
                   <li key={tag}>
-                    <Link href={`/${locale}/search?q=${encodeURIComponent(tag)}`} className="rounded-full bg-soft px-3 py-1 text-sm hover:bg-line">#{tag}</Link>
+                    <Link
+                      href={`/${locale}/search?q=${encodeURIComponent(tag)}`}
+                      className="rounded-full bg-soft px-3 py-1 text-sm hover:bg-line"
+                    >
+                      #{tag}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -139,7 +179,9 @@ export default async function ArticlePage({ params }: Props) {
             </div>
             {author && (
               <div className="mt-10 flex gap-5 rounded-2xl bg-soft p-6">
-                {author.photo && typeof author.photo === 'object' && <Media resource={author.photo} size="thumbnail" imgClassName="size-16 rounded-full object-cover" sizes="64px" />}
+                {author.photo && typeof author.photo === 'object' && (
+                  <Media resource={author.photo} size="thumbnail" imgClassName="size-16 rounded-full object-cover" sizes="64px" />
+                )}
                 <div>
                   <p className="font-semibold">{author.name}</p>
                   {author.role && <p className="text-sm text-muted">{author.role}</p>}
@@ -156,7 +198,9 @@ export default async function ArticlePage({ params }: Props) {
                 <ol className="space-y-2 text-sm">
                   {headings.map((h) => (
                     <li key={h.id} className={h.level === 3 ? 'ps-4' : ''}>
-                      <a href={`#${h.id}`} className="text-muted hover:text-brand">{h.text}</a>
+                      <a href={`#${h.id}`} className="text-muted hover:text-brand">
+                        {h.text}
+                      </a>
                     </li>
                   ))}
                 </ol>
@@ -168,11 +212,17 @@ export default async function ArticlePage({ params }: Props) {
                 <ul className="space-y-1.5 text-sm">
                   {services.map((s) =>
                     typeof s === 'object' ? (
-                      <li key={s.id}><Link href={docPath('services', s.slug, locale)} className="text-white/85 hover:text-white">{s.title}</Link></li>
+                      <li key={s.id}>
+                        <Link href={docPath('services', s.slug, locale)} className="text-white/85 hover:text-white">
+                          {s.title}
+                        </Link>
+                      </li>
                     ) : null,
                   )}
                 </ul>
-                <Link href={`/${locale}/request-a-quote`} className="btn btn-light mt-4 w-full py-2.5">{t.requestQuote}</Link>
+                <Link href={`/${locale}/request-a-quote`} className="btn btn-light mt-4 w-full py-2.5">
+                  {t.requestQuote}
+                </Link>
               </div>
             )}
           </aside>
@@ -209,11 +259,21 @@ export default async function ArticlePage({ params }: Props) {
             dateModified: article.updatedAt,
             keywords: tags.join(', ') || undefined,
             articleSection: categories.map((c) => c.title),
-            author: author ? { '@type': 'Person', name: author.name, jobTitle: author.role ?? undefined, sameAs: author.linkedin ? [author.linkedin] : undefined } : { '@type': 'Organization', name: settings.siteName },
+            author: author
+              ? {
+                  '@type': 'Person',
+                  name: author.name,
+                  jobTitle: author.role ?? undefined,
+                  sameAs: author.linkedin ? [author.linkedin] : undefined,
+                }
+              : { '@type': 'Organization', name: settings.siteName },
             publisher: {
               '@type': 'Organization',
               name: settings.siteName,
-              logo: settings.logo && typeof settings.logo === 'object' && settings.logo.url ? { '@type': 'ImageObject', url: absoluteURL(settings.logo.url) } : undefined,
+              logo:
+                settings.logo && typeof settings.logo === 'object' && settings.logo.url
+                  ? { '@type': 'ImageObject', url: absoluteURL(settings.logo.url) }
+                  : undefined,
             },
           },
           breadcrumbLd([

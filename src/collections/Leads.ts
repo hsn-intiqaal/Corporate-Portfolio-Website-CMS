@@ -2,13 +2,7 @@ import type { CollectionConfig, Endpoint } from 'payload'
 import { adminOnly, isAdmin } from '@/access'
 import { auditAfterDelete } from '@/hooks/audit'
 import { notifyNewLead } from '@/hooks/notifyLead'
-
-const csvCell = (value: unknown): string => {
-  let text = value === null || value === undefined ? '' : String(value)
-  // Prevent spreadsheet formula injection.
-  if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`
-  return `"${text.replace(/"/g, '""')}"`
-}
+import { toCsv } from '@/lib/csv'
 
 const exportCsv: Endpoint = {
   path: '/export-csv',
@@ -25,16 +19,32 @@ const exportCsv: Endpoint = {
       req,
       overrideAccess: false,
     })
-    const columns = ['createdAt', 'type', 'status', 'name', 'email', 'phone', 'company', 'service', 'projectLocation', 'timeline', 'budget', 'message', 'locale', 'sourcePage']
+    const columns = [
+      'createdAt',
+      'type',
+      'status',
+      'name',
+      'email',
+      'phone',
+      'company',
+      'service',
+      'projectLocation',
+      'timeline',
+      'budget',
+      'message',
+      'locale',
+      'sourcePage',
+    ]
     const rows = docs.map((lead) =>
-      columns
-        .map((col) => {
-          if (col === 'service') return csvCell(typeof lead.service === 'object' ? lead.service?.title : lead.service)
-          return csvCell((lead as unknown as Record<string, unknown>)[col])
-        })
-        .join(','),
+      columns.map((col) =>
+        col === 'service'
+          ? typeof lead.service === 'object'
+            ? lead.service?.title
+            : lead.service
+          : (lead as unknown as Record<string, unknown>)[col],
+      ),
     )
-    const body = '﻿' + [columns.join(','), ...rows].join('\r\n') // BOM so Excel shows Arabic correctly
+    const body = toCsv(columns, rows)
     return new Response(body, {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
@@ -132,7 +142,12 @@ export const Leads: CollectionConfig = {
         },
         { name: 'message', type: 'textarea', admin: { readOnly: true } },
         { name: 'attachments', type: 'upload', relationTo: 'lead-files', hasMany: true, admin: { readOnly: true } },
-        { name: 'document', type: 'relationship', relationTo: 'documents', admin: { readOnly: true, condition: (d) => d?.type === 'brochure' } },
+        {
+          name: 'document',
+          type: 'relationship',
+          relationTo: 'documents',
+          admin: { readOnly: true, condition: (d) => d?.type === 'brochure' },
+        },
       ],
     },
     {
@@ -162,7 +177,12 @@ export const Leads: CollectionConfig = {
       admin: { initCollapsed: true },
       fields: [
         { name: 'sourcePage', type: 'text', admin: { readOnly: true } },
-        { name: 'ipHash', type: 'text', index: true, admin: { readOnly: true, description: 'Hashed IP address used for rate limiting; the raw IP is not stored.' } },
+        {
+          name: 'ipHash',
+          type: 'text',
+          index: true,
+          admin: { readOnly: true, description: 'Hashed IP address used for rate limiting; the raw IP is not stored.' },
+        },
         { name: 'userAgent', type: 'text', admin: { readOnly: true } },
         { name: 'consent', type: 'checkbox', admin: { readOnly: true } },
       ],

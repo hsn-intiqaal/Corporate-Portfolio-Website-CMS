@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 import type { Service, ServiceCardsBlock } from '@/payload-types'
 import type { Locale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { getServices } from '@/lib/data'
 import { Icon } from '../site/Icon'
 import { Section, SectionHeading } from '../site/Section'
@@ -15,7 +15,7 @@ export async function ServiceCards({ block, locale }: { block: ServiceCardsBlock
   let services: Service[] = await getServices(locale, { featured: block.mode === 'featured', ids })
   if (ids) services = ids.map((id) => services.find((s) => s.id === id)).filter(Boolean) as Service[]
   if (services.length === 0) return null
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   return (
     <Section settings={block.settings}>
       <div className="container-site">

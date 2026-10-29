@@ -57,7 +57,12 @@ export function LeadForm({ type, locale, t, services }: Props) {
 
   if (state.status === 'success') {
     return (
-      <div ref={statusRef} tabIndex={-1} role="status" className="rounded-2xl bg-emerald-50 p-8 text-center text-emerald-900 ring-1 ring-emerald-200">
+      <div
+        ref={statusRef}
+        tabIndex={-1}
+        role="status"
+        className="rounded-2xl bg-emerald-50 p-8 text-center text-emerald-900 ring-1 ring-emerald-200"
+      >
         <p className="text-lg font-semibold">{state.message}</p>
       </div>
     )
@@ -88,7 +93,13 @@ export function LeadForm({ type, locale, t, services }: Props) {
       </div>
 
       {state.status === 'error' && state.message && (
-        <div ref={statusRef} tabIndex={-1} role="alert" data-form-error className="rounded-lg bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200">
+        <div
+          ref={statusRef}
+          tabIndex={-1}
+          role="alert"
+          data-form-error
+          className="rounded-lg bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200"
+        >
           {state.message}
         </div>
       )}
@@ -137,7 +148,13 @@ export function LeadForm({ type, locale, t, services }: Props) {
             <textarea {...a11y('message')} rows={6} required maxLength={5000} />
           </Field>
           <Field name="attachments" label={t.attachments} error={e.attachments}>
-            <input {...a11y('attachments')} type="file" multiple accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" className="field file:me-3 file:rounded-md file:border-0 file:bg-soft file:px-3 file:py-1.5 file:text-sm" />
+            <input
+              {...a11y('attachments')}
+              type="file"
+              multiple
+              accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+              className="field file:me-3 file:rounded-md file:border-0 file:bg-soft file:px-3 file:py-1.5 file:text-sm"
+            />
             <p className="mt-1.5 text-xs text-muted">{t.attachmentsHint}</p>
           </Field>
         </>
@@ -154,7 +171,13 @@ export function LeadForm({ type, locale, t, services }: Props) {
 
       <div>
         <label className="flex items-start gap-3 text-sm text-muted">
-          <input type="checkbox" name="consent" required className="mt-1 size-4 accent-[var(--color-brand)]" aria-invalid={e.consent ? true : undefined} />
+          <input
+            type="checkbox"
+            name="consent"
+            required
+            className="mt-1 size-4 accent-[var(--color-brand)]"
+            aria-invalid={e.consent ? true : undefined}
+          />
           <span>{t.consent}</span>
         </label>
         {e.consent && <p className="mt-1.5 text-sm text-red-600">{e.consent}</p>}

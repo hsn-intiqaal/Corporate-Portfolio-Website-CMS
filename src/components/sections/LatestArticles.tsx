@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 import type { LatestArticlesBlock } from '@/payload-types'
 import type { Locale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { getArticles } from '@/lib/data'
 import type { NumeralStyle } from '@/lib/format'
 import { Icon } from '../site/Icon'
@@ -15,7 +15,7 @@ export async function LatestArticles({ block, locale, numerals }: { block: Lates
   const { docs } = await getArticles(locale, { featured: block.mode === 'featured', ids, categoryIds, limit: block.limit ?? 3 })
   const articles = ids ? (ids.map((id) => docs.find((d) => d.id === id)).filter(Boolean) as typeof docs) : docs
   if (articles.length === 0) return null
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   return (
     <Section settings={block.settings}>
       <div className="container-site">

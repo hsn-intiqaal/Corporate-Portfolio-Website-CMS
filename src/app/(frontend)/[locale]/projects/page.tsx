@@ -6,7 +6,7 @@ import { ProjectFilter } from '@/components/sections/ProjectFilter'
 import { RenderSections } from '@/components/sections/RenderSections'
 import { PageHeader } from '@/components/site/PageHeader'
 import { isLocale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { getCategories, getPage, getProjects, getSettings } from '@/lib/data'
 import { buildMetadata } from '@/lib/seo'
 
@@ -18,20 +18,37 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
   if (!isLocale(locale)) return {}
   const [page, settings] = await Promise.all([getPage('projects', locale), getSettings(locale)])
-  return buildMetadata({ locale, path: '/projects', meta: page?.doc.meta, fallbackTitle: page?.doc.title || getDictionary(locale).projects, settings })
+  return buildMetadata({
+    locale,
+    path: '/projects',
+    meta: page?.doc.meta,
+    fallbackTitle: page?.doc.title || (await getTexts(locale)).projects,
+    settings,
+  })
 }
 
 export default async function ProjectsPage({ params }: Props) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
-  const t = getDictionary(locale)
-  const [page, projects, categories, settings] = await Promise.all([getPage('projects', locale), getProjects(locale), getCategories(locale), getSettings(locale)])
+  const t = await getTexts(locale)
+  const [page, projects, categories, settings] = await Promise.all([
+    getPage('projects', locale),
+    getProjects(locale),
+    getCategories(locale),
+    getSettings(locale),
+  ])
   const numerals = settings.arabicNumerals ?? 'western'
   const title = page?.doc.title || t.projects
   const usedCategoryIds = new Set(projects.flatMap((p) => (p.categories ?? []).map((c) => (typeof c === 'object' ? c.id : c))))
   return (
     <>
-      <PageHeader title={title} crumbs={[{ name: t.home, path: `/${locale}` }, { name: title, path: `/${locale}/projects` }]} />
+      <PageHeader
+        title={title}
+        crumbs={[
+          { name: t.home, path: `/${locale}` },
+          { name: title, path: `/${locale}/projects` },
+        ]}
+      />
       <section className="py-16 sm:py-20">
         <div className="container-site">
           <ProjectFilter

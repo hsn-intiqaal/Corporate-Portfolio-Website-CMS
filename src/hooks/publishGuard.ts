@@ -13,7 +13,11 @@ export const publishGuard: CollectionBeforeChangeHook = async ({ data, originalD
 
   const settings = await req.payload.findGlobal({ slug: 'settings', depth: 0, req, overrideAccess: true })
   if (!settings?.editorsCanPublish) {
-    throw new APIError('Your role can save drafts only. Ask an administrator to publish.', 403, undefined, true)
+    const message =
+      req.i18n?.language === 'ar'
+        ? 'صلاحيتك تسمح بحفظ المسودات فقط. اطلب من المدير نشرها.'
+        : 'Your role can save drafts only. Ask an administrator to publish.'
+    throw new APIError(message, 403, undefined, true)
   }
   return data
 }

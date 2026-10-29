@@ -17,6 +17,7 @@ export async function DraftBanner({ t }: { t: Dictionary }) {
   return (
     <div className="sticky top-0 z-[60] flex items-center justify-center gap-4 bg-amber-400 px-4 py-2 text-sm font-medium text-ink">
       {t.draftBanner}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- route handler that clears draft mode, must be a full request */}
       <a href="/next/exit-preview" className="underline">
         {t.exitPreview}
       </a>

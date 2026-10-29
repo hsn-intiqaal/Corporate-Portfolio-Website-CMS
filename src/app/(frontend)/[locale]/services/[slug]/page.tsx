@@ -11,7 +11,7 @@ import { TranslationNotice } from '@/components/site/Notices'
 import { PageHeader } from '@/components/site/PageHeader'
 import { RichText } from '@/components/site/RichText'
 import { isLocale, locales } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { followRedirect, getAllSlugs, getProjects, getService, getServices, getSettings } from '@/lib/data'
 import { absoluteURL, docPath } from '@/lib/paths'
 import { buildMetadata } from '@/lib/seo'
@@ -32,7 +32,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const [res, settings] = await Promise.all([getService(decodeURIComponent(slug), locale), getSettings(locale)])
   if (!res) return {}
   const s = res.doc
-  return buildMetadata({ locale, path: `/services/${s.slug}`, meta: s.meta, fallbackTitle: s.title, fallbackDescription: s.excerpt, fallbackImage: s.image, settings })
+  return buildMetadata({
+    locale,
+    path: `/services/${s.slug}`,
+    meta: s.meta,
+    fallbackTitle: s.title,
+    fallbackDescription: s.excerpt,
+    fallbackImage: s.image,
+    settings,
+  })
 }
 
 export default async function ServicePage({ params }: Props) {
@@ -45,8 +53,12 @@ export default async function ServicePage({ params }: Props) {
     notFound()
   }
   const service = res.doc
-  const t = getDictionary(locale)
-  const [settings, allServices, projects] = await Promise.all([getSettings(locale), getServices(locale), getProjects(locale, { limit: 100 })])
+  const t = await getTexts(locale)
+  const [settings, allServices, projects] = await Promise.all([
+    getSettings(locale),
+    getServices(locale),
+    getProjects(locale, { limit: 100 }),
+  ])
   const numerals = settings.arabicNumerals ?? 'western'
   const related = projects.filter((p) => p.services?.some((s) => (typeof s === 'object' ? s.id : s) === service.id)).slice(0, 3)
   const others = allServices.filter((s) => s.id !== service.id).slice(0, 6)
@@ -73,7 +85,13 @@ export default async function ServicePage({ params }: Props) {
         <div className="container-site grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
             {service.image && typeof service.image === 'object' && (
-              <Media resource={service.image} size="large" priority imgClassName="mb-10 aspect-[16/9] w-full rounded-2xl object-cover" sizes="(max-width: 1024px) 100vw, 66vw" />
+              <Media
+                resource={service.image}
+                size="large"
+                priority
+                imgClassName="mb-10 aspect-[16/9] w-full rounded-2xl object-cover"
+                sizes="(max-width: 1024px) 100vw, 66vw"
+              />
             )}
             <RichText data={service.content} locale={locale} className="text-lg" />
             {service.highlights && service.highlights.length > 0 && (
@@ -105,7 +123,10 @@ export default async function ServicePage({ params }: Props) {
                 <ul className="space-y-1">
                   {others.map((s) => (
                     <li key={s.id}>
-                      <Link href={docPath('services', s.slug, locale)} className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-soft">
+                      <Link
+                        href={docPath('services', s.slug, locale)}
+                        className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-soft"
+                      >
                         {s.title} <Icon name="chevron" className="size-4 text-muted" />
                       </Link>
                     </li>

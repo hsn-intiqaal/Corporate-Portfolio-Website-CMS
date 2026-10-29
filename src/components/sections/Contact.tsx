@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 import type { ContactBlock } from '@/payload-types'
 import type { Locale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/dictionary'
+import { getTexts } from '@/lib/texts'
 import { getServices, getSettings } from '@/lib/data'
 import { LeadForm } from '../forms/LeadForm'
 import { Icon } from '../site/Icon'
@@ -9,11 +9,17 @@ import { Section, SectionHeading } from '../site/Section'
 
 export async function Contact({ block, locale }: { block: ContactBlock; locale: Locale }) {
   const [settings, services] = await Promise.all([getSettings(locale), block.form === 'quote' ? getServices(locale) : Promise.resolve([])])
-  const t = getDictionary(locale)
+  const t = await getTexts(locale)
   const hasForm = block.form && block.form !== 'none'
   const details = [
     settings.phone && { icon: 'phone', label: t.phone, value: settings.phone, href: `tel:${settings.phone.replace(/\s/g, '')}`, ltr: true },
-    settings.whatsapp && { icon: 'whatsapp', label: t.whatsapp, value: `+${settings.whatsapp.replace(/\D/g, '')}`, href: `https://wa.me/${settings.whatsapp.replace(/\D/g, '')}`, ltr: true },
+    settings.whatsapp && {
+      icon: 'whatsapp',
+      label: t.whatsapp,
+      value: `+${settings.whatsapp.replace(/\D/g, '')}`,
+      href: `https://wa.me/${settings.whatsapp.replace(/\D/g, '')}`,
+      ltr: true,
+    },
     settings.email && { icon: 'mail', label: t.email, value: settings.email, href: `mailto:${settings.email}` },
     settings.address && { icon: 'pin', label: t.address, value: settings.address },
     settings.workingHours && { icon: 'clock', label: '', value: settings.workingHours },
@@ -27,7 +33,12 @@ export async function Contact({ block, locale }: { block: ContactBlock; locale: 
           {hasForm && (
             <div className="rounded-2xl bg-white p-6 text-ink shadow-sm ring-1 ring-line sm:p-8 lg:col-span-3">
               <Suspense fallback={null}>
-                <LeadForm type={block.form as 'contact' | 'quote'} locale={locale} t={t.form} services={services.map((s) => ({ id: s.id, title: s.title }))} />
+                <LeadForm
+                  type={block.form as 'contact' | 'quote'}
+                  locale={locale}
+                  t={t.form}
+                  services={services.map((s) => ({ id: s.id, title: s.title }))}
+                />
               </Suspense>
             </div>
           )}
@@ -42,7 +53,13 @@ export async function Contact({ block, locale }: { block: ContactBlock; locale: 
                     <div>
                       {d.label && <div className="text-sm text-muted">{d.label}</div>}
                       {d.href ? (
-                        <a href={d.href} dir={d.ltr ? 'ltr' : undefined} className="font-semibold hover:text-brand" target={d.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
+                        <a
+                          href={d.href}
+                          dir={d.ltr ? 'ltr' : undefined}
+                          className="font-semibold hover:text-brand"
+                          target={d.href.startsWith('http') ? '_blank' : undefined}
+                          rel="noopener noreferrer"
+                        >
                           {d.value}
                         </a>
                       ) : (

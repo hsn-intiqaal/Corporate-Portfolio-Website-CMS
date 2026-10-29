@@ -41,7 +41,13 @@ export const Articles: CollectionConfig = {
         {
           label: 'Content',
           fields: [
-            { name: 'excerpt', type: 'textarea', localized: true, maxLength: 300, admin: { description: 'Summary for article cards, RSS and the default meta description.' } },
+            {
+              name: 'excerpt',
+              type: 'textarea',
+              localized: true,
+              maxLength: 300,
+              admin: { description: 'Summary for article cards, RSS and the default meta description.' },
+            },
             { name: 'coverImage', type: 'upload', relationTo: 'media', required: true },
             { name: 'content', type: 'richText', localized: true, required: true },
             {
@@ -57,19 +63,44 @@ export const Articles: CollectionConfig = {
       ],
     },
     slugField(),
-    { name: 'publishedAt', type: 'date', index: true, admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' }, description: 'Set automatically on first publish; can be back-dated.' } },
+    {
+      name: 'publishedAt',
+      type: 'date',
+      index: true,
+      admin: {
+        position: 'sidebar',
+        date: { pickerAppearance: 'dayAndTime' },
+        description: 'Set automatically on first publish; can be back-dated.',
+      },
+    },
     { name: 'author', type: 'relationship', relationTo: 'authors', admin: { position: 'sidebar' } },
     { name: 'categories', type: 'relationship', relationTo: 'article-categories', hasMany: true, admin: { position: 'sidebar' } },
     {
       // An array of localized rows (rather than a localized hasMany text field) so tags are searchable.
       name: 'tags',
       type: 'array',
-      admin: { position: 'sidebar', description: 'Keywords: shown on the article, used by site search and as meta keywords.', initCollapsed: true },
+      admin: {
+        position: 'sidebar',
+        description: 'Keywords: shown on the article, used by site search and as meta keywords.',
+        initCollapsed: true,
+      },
       fields: [{ name: 'tag', type: 'text', localized: true, required: true }],
     },
-    { name: 'relatedArticles', type: 'relationship', relationTo: 'articles', hasMany: true, maxRows: 3, admin: { position: 'sidebar', description: 'Leave empty to pick automatically from the same category.' }, filterOptions: ({ id }) => ({ id: { not_equals: id } }) },
+    {
+      name: 'relatedArticles',
+      type: 'relationship',
+      relationTo: 'articles',
+      hasMany: true,
+      maxRows: 3,
+      admin: { position: 'sidebar', description: 'Leave empty to pick automatically from the same category.' },
+      filterOptions: ({ id }) => ({ id: { not_equals: id } }),
+    },
     { name: 'relatedServices', type: 'relationship', relationTo: 'services', hasMany: true, admin: { position: 'sidebar' } },
-    { name: 'readingTime', type: 'number', admin: { position: 'sidebar', readOnly: true, description: 'Minutes, calculated automatically.' } },
+    {
+      name: 'readingTime',
+      type: 'number',
+      admin: { position: 'sidebar', readOnly: true, description: 'Minutes, calculated automatically.' },
+    },
     featuredField,
     archivedField,
   ],

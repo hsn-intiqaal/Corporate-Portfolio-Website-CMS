@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { adminOnly, staffOnly } from '@/access'
 import { auditAfterDelete } from '@/hooks/audit'
+import { vmsg } from '@/fields/messages'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -38,8 +39,9 @@ export const Media: CollectionConfig = {
       required: true,
       localized: true,
       admin: { description: 'Describe the image for visitors using screen readers and for search engines. Required.' },
-      validate: (value: unknown) =>
-        (typeof value === 'string' && value.trim().length >= 3) || 'Alternative text is required (at least 3 characters)',
+      validate: (value: unknown, o: unknown) =>
+        (typeof value === 'string' && value.trim().length >= 3) ||
+        vmsg(o, 'Alternative text is required (at least 3 characters)', 'النص البديل مطلوب (3 أحرف على الأقل)'),
     },
     { name: 'caption', type: 'text', localized: true },
   ],

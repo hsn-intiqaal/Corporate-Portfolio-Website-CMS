@@ -3,7 +3,8 @@ import { locales, type Locale } from '@/i18n/config'
 import type { Media, Setting } from '@/payload-types'
 import { absoluteURL } from './paths'
 
-type Meta = { title?: string | null; description?: string | null; image?: number | Media | null; noIndex?: boolean | null } | null | undefined
+type Meta =
+  { title?: string | null; description?: string | null; image?: number | Media | null; noIndex?: boolean | null } | null | undefined
 
 const imageUrl = (img: unknown): string | undefined => {
   if (!img || typeof img !== 'object') return undefined

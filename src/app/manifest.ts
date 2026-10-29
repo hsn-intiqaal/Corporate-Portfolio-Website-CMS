@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next'
 import { getSettings } from '@/lib/data'
-import { brandPalettes, type BrandPalette } from '@/fields/palette'
+import { resolveColors } from '@/theme/css'
 
 export const dynamic = 'force-dynamic'
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const settings = await getSettings('ar').catch(() => null)
-  const palette = brandPalettes[(settings?.palette as BrandPalette) ?? 'ocean'] ?? brandPalettes.ocean
+  const colors = resolveColors(settings?.theme)
   const icon = settings?.favicon && typeof settings.favicon === 'object' ? settings.favicon.url : null
   return {
     name: settings?.siteName ?? 'Website',
@@ -15,7 +15,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: palette.primary,
+    theme_color: colors.primary,
     dir: 'rtl',
     lang: 'ar',
     icons: icon ? [{ src: icon, sizes: '512x512', type: 'image/png' }] : [],

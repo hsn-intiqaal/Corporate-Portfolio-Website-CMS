@@ -1,16 +1,30 @@
 import type { CollectionConfig, Endpoint } from 'payload'
 import { adminOnly, isAdmin } from '@/access'
+import { toCsv } from '@/lib/csv'
 
 const exportCsv: Endpoint = {
   path: '/export-csv',
   method: 'get',
   handler: async (req) => {
     if (!isAdmin(req)) return Response.json({ error: 'Forbidden' }, { status: 403 })
-    const { docs } = await req.payload.find({ collection: 'subscribers', where: { status: { equals: 'confirmed' } }, limit: 50000, depth: 0, req, overrideAccess: false })
-    const cell = (v: unknown) => `"${String(v ?? '').replace(/^([=+\-@])/, "'$1").replace(/"/g, '""')}"`
-    const rows = docs.map((s) => [s.email, s.name, s.locale, s.confirmedAt].map(cell).join(','))
-    return new Response('﻿' + ['email,name,locale,confirmedAt', ...rows].join('\r\n'), {
-      headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="subscribers.csv"', 'Cache-Control': 'no-store' },
+    const { docs } = await req.payload.find({
+      collection: 'subscribers',
+      where: { status: { equals: 'confirmed' } },
+      limit: 50000,
+      depth: 0,
+      req,
+      overrideAccess: false,
+    })
+    const body = toCsv(
+      ['email', 'name', 'locale', 'confirmedAt'],
+      docs.map((s) => [s.email, s.name, s.locale, s.confirmedAt]),
+    )
+    return new Response(body, {
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'attachment; filename="subscribers.csv"',
+        'Cache-Control': 'no-store',
+      },
     })
   },
 }

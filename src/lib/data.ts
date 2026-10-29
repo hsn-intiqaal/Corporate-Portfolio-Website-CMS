@@ -84,7 +84,15 @@ export const ARTICLES_PER_PAGE = 9
 export const getArticles = cache(
   async (
     locale: Locale,
-    filter: { page?: number; limit?: number; categoryId?: number; featured?: boolean; ids?: number[]; excludeId?: number; categoryIds?: number[] } = {},
+    filter: {
+      page?: number
+      limit?: number
+      categoryId?: number
+      featured?: boolean
+      ids?: number[]
+      excludeId?: number
+      categoryIds?: number[]
+    } = {},
   ) => {
     const payload = await getPayloadClient()
     const and: Where[] = [visible]
@@ -113,17 +121,37 @@ export const getArticles = cache(
 
 export const getArticleCategories = cache(async (locale: Locale): Promise<ArticleCategory[]> => {
   const payload = await getPayloadClient()
-  const res = await payload.find({ collection: 'article-categories', sort: '_order', limit: 100, depth: 0, locale, fallbackLocale: otherLocale(locale) })
+  const res = await payload.find({
+    collection: 'article-categories',
+    sort: '_order',
+    limit: 100,
+    depth: 0,
+    locale,
+    fallbackLocale: otherLocale(locale),
+  })
   return res.docs
 })
 
 export const getArticleCategory = cache(async (slug: string, locale: Locale): Promise<ArticleCategory | null> => {
   const payload = await getPayloadClient()
-  const res = await payload.find({ collection: 'article-categories', where: { slug: { equals: slug } }, limit: 1, depth: 0, locale, fallbackLocale: otherLocale(locale) })
+  const res = await payload.find({
+    collection: 'article-categories',
+    where: { slug: { equals: slug } },
+    limit: 1,
+    depth: 0,
+    locale,
+    fallbackLocale: otherLocale(locale),
+  })
   return res.docs[0] ?? null
 })
 
-export type SearchHit = { collection: 'services' | 'projects' | 'articles' | 'pages'; slug: string; title: string; excerpt?: string | null; image?: unknown }
+export type SearchHit = {
+  collection: 'services' | 'projects' | 'articles' | 'pages'
+  slug: string
+  title: string
+  excerpt?: string | null
+  image?: unknown
+}
 
 /** Simple site search over titles and summaries in the visitor's language. */
 export const searchSite = async (query: string, locale: Locale): Promise<SearchHit[]> => {
@@ -135,13 +163,30 @@ export const searchSite = async (query: string, locale: Locale): Promise<SearchH
   const [services, projects, articles, pages] = await Promise.all([
     payload.find({ collection: 'services', where: { and: [visible, textMatch(['title', 'excerpt'])] }, ...common }),
     payload.find({ collection: 'projects', where: { and: [visible, textMatch(['title', 'excerpt', 'location'])] }, ...common }),
-    payload.find({ collection: 'articles', where: { and: [visible, textMatch(['title', 'excerpt', 'tags.tag'])] }, sort: '-publishedAt', ...common }),
+    payload.find({
+      collection: 'articles',
+      where: { and: [visible, textMatch(['title', 'excerpt', 'tags.tag'])] },
+      sort: '-publishedAt',
+      ...common,
+    }),
     payload.find({ collection: 'pages', where: { and: [visible, textMatch(['title']), { slug: { not_in: ['home'] } }] }, ...common }),
   ])
   return [
     ...services.docs.map((d) => ({ collection: 'services' as const, slug: d.slug, title: d.title, excerpt: d.excerpt, image: d.image })),
-    ...projects.docs.map((d) => ({ collection: 'projects' as const, slug: d.slug, title: d.title, excerpt: d.excerpt, image: d.coverImage })),
-    ...articles.docs.map((d) => ({ collection: 'articles' as const, slug: d.slug, title: d.title, excerpt: d.excerpt, image: d.coverImage })),
+    ...projects.docs.map((d) => ({
+      collection: 'projects' as const,
+      slug: d.slug,
+      title: d.title,
+      excerpt: d.excerpt,
+      image: d.coverImage,
+    })),
+    ...articles.docs.map((d) => ({
+      collection: 'articles' as const,
+      slug: d.slug,
+      title: d.title,
+      excerpt: d.excerpt,
+      image: d.coverImage,
+    })),
     ...pages.docs.map((d) => ({ collection: 'pages' as const, slug: d.slug, title: d.title })),
   ]
 }
@@ -209,7 +254,14 @@ export const getProjects = cache(
 
 export const getCategories = cache(async (locale: Locale): Promise<ProjectCategory[]> => {
   const payload = await getPayloadClient()
-  const res = await payload.find({ collection: 'project-categories', sort: '_order', limit: 100, depth: 0, locale, fallbackLocale: otherLocale(locale) })
+  const res = await payload.find({
+    collection: 'project-categories',
+    sort: '_order',
+    limit: 100,
+    depth: 0,
+    locale,
+    fallbackLocale: otherLocale(locale),
+  })
   return res.docs
 })
 
@@ -221,12 +273,23 @@ export const getAllSlugs = cache(async (collection: DocCollection) => {
     where: visible,
     limit: 1000,
     depth: 1,
-    select: { slug: true, updatedAt: true, meta: { noIndex: true }, ...(collection === 'services' ? { image: true } : collection === 'pages' ? {} : { coverImage: true }) } as never,
+    select: {
+      slug: true,
+      updatedAt: true,
+      meta: { noIndex: true },
+      ...(collection === 'services' ? { image: true } : collection === 'pages' ? {} : { coverImage: true }),
+    } as never,
     overrideAccess: false,
     draft: false,
     pagination: false,
   })
-  type Row = { slug: string; updatedAt: string; meta?: { noIndex?: boolean | null }; image?: { url?: string | null } | null; coverImage?: { url?: string | null } | null }
+  type Row = {
+    slug: string
+    updatedAt: string
+    meta?: { noIndex?: boolean | null }
+    image?: { url?: string | null } | null
+    coverImage?: { url?: string | null } | null
+  }
   // `image` is the absolute URL of the main image, used for image entries in the sitemap.
   return (res.docs as unknown as Row[]).map((d) => {
     const url = (d.image ?? d.coverImage)?.url
