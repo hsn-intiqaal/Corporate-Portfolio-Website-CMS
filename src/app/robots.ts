@@ -10,7 +10,14 @@ export default function robots(): MetadataRoute.Robots {
       : true
   if (!isProduction) return { rules: [{ userAgent: '*', disallow: '/' }] }
   return {
-    rules: [{ userAgent: '*', allow: '/', disallow: ['/admin', '/api', '/next'] }],
+    rules: [
+      {
+        userAgent: '*',
+        // Images are served from /api/media/file when no CDN bucket is configured: keep them crawlable for image search.
+        allow: ['/', '/api/media/file/'],
+        disallow: ['/admin', '/api/', '/next/'],
+      },
+    ],
     sitemap: absoluteURL('/sitemap.xml'),
   }
 }

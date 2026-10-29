@@ -51,6 +51,8 @@ export default buildConfig({
     meta: { titleSuffix: ' — Dashboard', robots: 'noindex, nofollow' },
     components: {
       beforeDashboard: ['@/components/admin/DashboardPanel#DashboardPanel'],
+      actions: ['@/components/admin/LanguageToggle#LanguageToggle'],
+      graphics: { Logo: '@/components/admin/Brand#Logo', Icon: '@/components/admin/Brand#Icon' },
     },
     dateFormat: 'd MMM yyyy, HH:mm',
   },

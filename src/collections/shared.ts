@@ -4,6 +4,7 @@ import { auditAfterChange, auditAfterDelete } from '@/hooks/audit'
 import { publishGuard } from '@/hooks/publishGuard'
 import { revalidateAfterChange, revalidateAfterDelete } from '@/hooks/revalidate'
 import { slugRedirect } from '@/hooks/slugRedirect'
+import { pingIndexNow } from '@/lib/indexnow'
 
 /** Access, versions and hooks shared by the published content collections. */
 export const contentCollectionDefaults = (): Pick<CollectionConfig, 'access' | 'versions' | 'hooks'> => ({
@@ -11,7 +12,7 @@ export const contentCollectionDefaults = (): Pick<CollectionConfig, 'access' | '
   versions: { drafts: { autosave: { interval: 2000 }, schedulePublish: true }, maxPerDoc: 50 },
   hooks: {
     beforeChange: [publishGuard],
-    afterChange: [slugRedirect, revalidateAfterChange, auditAfterChange],
+    afterChange: [slugRedirect, revalidateAfterChange, auditAfterChange, pingIndexNow],
     afterDelete: [revalidateAfterDelete, auditAfterDelete],
   },
 })

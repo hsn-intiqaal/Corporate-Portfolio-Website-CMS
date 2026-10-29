@@ -4,7 +4,22 @@ import type { Media, Setting } from '@/payload-types'
 import { absoluteURL } from './paths'
 
 type Meta =
-  { title?: string | null; description?: string | null; image?: number | Media | null; noIndex?: boolean | null } | null | undefined
+  | {
+      title?: string | null
+      description?: string | null
+      image?: number | Media | null
+      noIndex?: boolean | null
+      canonical?: string | null
+    }
+  | null
+  | undefined
+
+/** Indexable pages: allow large image previews and full snippets (Google search and Discover). */
+export const INDEXABLE_ROBOTS: Metadata['robots'] = {
+  index: true,
+  follow: true,
+  googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
+}
 
 const imageUrl = (img: unknown): string | undefined => {
   if (!img || typeof img !== 'object') return undefined
@@ -41,7 +56,8 @@ export function buildMetadata({
   const title = path === '' && !meta?.title ? baseTitle : `${baseTitle}${suffix}`
   const description = meta?.description || fallbackDescription || settings.defaultDescription || undefined
   const image = imageUrl(meta?.image) || imageUrl(fallbackImage) || imageUrl(settings.defaultImage)
-  const canonical = absoluteURL(`/${locale}${path}`)
+  // An explicit canonical (content syndicated from elsewhere) wins over the page's own URL.
+  const canonical = meta?.canonical || absoluteURL(`/${locale}${path}`)
   const languages: Record<string, string> = Object.fromEntries(locales.map((l) => [l, absoluteURL(`/${l}${path}`)]))
   languages['x-default'] = absoluteURL(`/ar${path}`)
 
@@ -49,7 +65,7 @@ export function buildMetadata({
     title: { absolute: title },
     description,
     alternates: { canonical, languages },
-    robots: meta?.noIndex ? { index: false, follow: true } : undefined,
+    robots: meta?.noIndex ? { index: false, follow: true, googleBot: { index: false, follow: true } } : INDEXABLE_ROBOTS,
     openGraph: {
       type: 'website',
       siteName: settings.siteName ?? undefined,
@@ -60,7 +76,14 @@ export function buildMetadata({
       alternateLocale: locale === 'ar' ? ['en_US'] : ['ar_SA'],
       images: image ? [{ url: image, width: 1200, height: 630 }] : undefined,
     },
-    twitter: { card: image ? 'summary_large_image' : 'summary', title, description, images: image ? [image] : undefined },
+    twitter: {
+      card: image ? 'summary_large_image' : 'summary',
+      title,
+      description,
+      images: image ? [image] : undefined,
+      site: settings.twitterHandle || undefined,
+      creator: settings.twitterHandle || undefined,
+    },
   }
 }
 

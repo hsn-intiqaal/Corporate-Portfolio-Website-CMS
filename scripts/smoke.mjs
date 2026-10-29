@@ -26,9 +26,15 @@ check('Unknown page is a 404', async () => {
   const r = await get('/en/this-page-does-not-exist-xyz')
   if (r.status !== 404) throw new Error(`status ${r.status}`)
 })
-check('sitemap.xml lists both languages', async () => {
-  const xml = await (await get('/sitemap.xml')).text()
-  if (!xml.includes('/ar') || !xml.includes('/en')) throw new Error('missing locales')
+check('Sitemap index links typed sitemaps that list both languages', async () => {
+  const index = await (await get('/sitemap.xml')).text()
+  if (!index.includes('<sitemapindex')) throw new Error('not a sitemap index')
+  const pages = await (await get('/sitemaps/pages.xml')).text()
+  if (!pages.includes('/ar') || !pages.includes('/en') || !pages.includes('hreflang')) throw new Error('pages sitemap incomplete')
+})
+check('robots.txt allows images and points to the sitemap', async () => {
+  const txt = await (await get('/robots.txt')).text()
+  if (!txt.includes('Allow: /api/media/file/') || !/Sitemap: .*\/sitemap\.xml/.test(txt)) throw new Error(txt)
 })
 check('RSS feeds are valid XML with items', async () => {
   for (const l of ['ar', 'en']) {
@@ -43,10 +49,6 @@ check('Search works and is not indexed', async () => {
 })
 check('Web app manifest is served', async () => {
   const r = await get('/manifest.webmanifest')
-  if (r.status !== 200) throw new Error(`status ${r.status}`)
-})
-check('robots.txt is served', async () => {
-  const r = await get('/robots.txt')
   if (r.status !== 200) throw new Error(`status ${r.status}`)
 })
 check('Leads are not public', async () => {

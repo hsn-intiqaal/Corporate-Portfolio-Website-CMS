@@ -204,13 +204,24 @@ export interface Page {
       )[]
     | null;
   meta?: {
+    /**
+     * The main phrase people would search for to find this page. Used only for the tips above; it is not published.
+     */
+    keyword?: string | null;
     title?: string | null;
     description?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
     image?: (number | null) | Media;
+    /**
+     * Removes the page from Google results and from the sitemap. Links on it are still followed.
+     */
     noIndex?: boolean | null;
+    /**
+     * Only when this content is duplicated elsewhere: the full URL of the original page. Leave empty normally.
+     */
+    canonical?: string | null;
   };
   /**
    * Used in the URL. Generated from the English title if left empty. Changing it creates a redirect automatically.
@@ -415,13 +426,24 @@ export interface Service {
       )[]
     | null;
   meta?: {
+    /**
+     * The main phrase people would search for to find this page. Used only for the tips above; it is not published.
+     */
+    keyword?: string | null;
     title?: string | null;
     description?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
     image?: (number | null) | Media;
+    /**
+     * Removes the page from Google results and from the sitemap. Links on it are still followed.
+     */
     noIndex?: boolean | null;
+    /**
+     * Only when this content is duplicated elsewhere: the full URL of the original page. Leave empty normally.
+     */
+    canonical?: string | null;
   };
   /**
    * Used in the URL. Generated from the English title if left empty. Changing it creates a redirect automatically.
@@ -565,13 +587,24 @@ export interface Project {
       )[]
     | null;
   meta?: {
+    /**
+     * The main phrase people would search for to find this page. Used only for the tips above; it is not published.
+     */
+    keyword?: string | null;
     title?: string | null;
     description?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
     image?: (number | null) | Media;
+    /**
+     * Removes the page from Google results and from the sitemap. Links on it are still followed.
+     */
     noIndex?: boolean | null;
+    /**
+     * Only when this content is duplicated elsewhere: the full URL of the original page. Leave empty normally.
+     */
+    canonical?: string | null;
   };
   /**
    * Used in the URL. Generated from the English title if left empty. Changing it creates a redirect automatically.
@@ -919,13 +952,24 @@ export interface Article {
       )[]
     | null;
   meta?: {
+    /**
+     * The main phrase people would search for to find this page. Used only for the tips above; it is not published.
+     */
+    keyword?: string | null;
     title?: string | null;
     description?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
     image?: (number | null) | Media;
+    /**
+     * Removes the page from Google results and from the sitemap. Links on it are still followed.
+     */
     noIndex?: boolean | null;
+    /**
+     * Only when this content is duplicated elsewhere: the full URL of the original page. Leave empty normally.
+     */
+    canonical?: string | null;
   };
   /**
    * Used in the URL. Generated from the English title if left empty. Changing it creates a redirect automatically.
@@ -1676,10 +1720,12 @@ export interface PagesSelect<T extends boolean = true> {
   meta?:
     | T
     | {
+        keyword?: T;
         title?: T;
         description?: T;
         image?: T;
         noIndex?: T;
+        canonical?: T;
       };
   slug?: T;
   template?: T;
@@ -2174,10 +2220,12 @@ export interface ServicesSelect<T extends boolean = true> {
   meta?:
     | T
     | {
+        keyword?: T;
         title?: T;
         description?: T;
         image?: T;
         noIndex?: T;
+        canonical?: T;
       };
   slug?: T;
   featured?: T;
@@ -2228,10 +2276,12 @@ export interface ProjectsSelect<T extends boolean = true> {
   meta?:
     | T
     | {
+        keyword?: T;
         title?: T;
         description?: T;
         image?: T;
         noIndex?: T;
+        canonical?: T;
       };
   slug?: T;
   categories?: T;
@@ -2290,10 +2340,12 @@ export interface ArticlesSelect<T extends boolean = true> {
   meta?:
     | T
     | {
+        keyword?: T;
         title?: T;
         description?: T;
         image?: T;
         noIndex?: T;
+        canonical?: T;
       };
   slug?: T;
   publishedAt?: T;
@@ -2899,16 +2951,64 @@ export interface Setting {
    * Appended to page titles, e.g. " | Company"
    */
   titleSuffix?: string | null;
+  /**
+   * Another name people use for the company (acronym or short name). Helps Google show the right site name.
+   */
+  siteAlternateName?: string | null;
   defaultDescription?: string | null;
   /**
    * Default social sharing image (1200×630)
    */
   defaultImage?: (number | null) | Media;
-  organizationType?: ('Organization' | 'LocalBusiness') | null;
+  /**
+   * X (Twitter) account for link cards, e.g. @company
+   */
+  twitterHandle?: string | null;
   /**
    * Google Search Console HTML-tag verification code (content value only)
    */
   googleSiteVerification?: string | null;
+  /**
+   * Bing Webmaster Tools verification code (msvalidate.01 content value)
+   */
+  bingSiteVerification?: string | null;
+  /**
+   * Yandex Webmaster verification code (optional)
+   */
+  yandexVerification?: string | null;
+  /**
+   * Google does not support IndexNow; it discovers changes through the sitemap.
+   */
+  indexNow?: boolean | null;
+  organizationType?: ('Organization' | 'LocalBusiness' | 'HomeAndConstructionBusiness' | 'ProfessionalService') | null;
+  legalName?: string | null;
+  foundingYear?: number | null;
+  /**
+   * e.g. $$ (local businesses)
+   */
+  priceRange?: string | null;
+  streetAddress?: string | null;
+  city?: string | null;
+  region?: string | null;
+  postalCode?: string | null;
+  /**
+   * Two letters, e.g. SA, EG, AE
+   */
+  countryCode?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  /**
+   * Cities or countries you serve, separated by commas
+   */
+  areaServed?: string | null;
+  openingHours?:
+    | {
+        days: ('Saturday' | 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday')[];
+        opens: string;
+        closes: string;
+        id?: string | null;
+      }[]
+    | null;
   missingTranslation?: ('fallback' | 'hide') | null;
   arabicNumerals?: ('western' | 'eastern') | null;
   /**
@@ -3569,10 +3669,34 @@ export interface SettingsSelect<T extends boolean = true> {
       };
   defaultTitle?: T;
   titleSuffix?: T;
+  siteAlternateName?: T;
   defaultDescription?: T;
   defaultImage?: T;
-  organizationType?: T;
+  twitterHandle?: T;
   googleSiteVerification?: T;
+  bingSiteVerification?: T;
+  yandexVerification?: T;
+  indexNow?: T;
+  organizationType?: T;
+  legalName?: T;
+  foundingYear?: T;
+  priceRange?: T;
+  streetAddress?: T;
+  city?: T;
+  region?: T;
+  postalCode?: T;
+  countryCode?: T;
+  latitude?: T;
+  longitude?: T;
+  areaServed?: T;
+  openingHours?:
+    | T
+    | {
+        days?: T;
+        opens?: T;
+        closes?: T;
+        id?: T;
+      };
   missingTranslation?: T;
   arabicNumerals?: T;
   webhookUrl?: T;
